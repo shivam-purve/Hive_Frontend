@@ -32,7 +32,7 @@ class _Home extends State<Home> {
     const Navigation(),
     const Create(),
     const Notifs(),
-    const User()
+    const UserProfilePage()
   ];
   @override
   Widget build(BuildContext context) {
