@@ -74,8 +74,24 @@ Widget postCard({
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                const Icon(Icons.thumb_up_alt_outlined, size: 20),
-                const SizedBox(width: 8),
+                GestureDetector(
+                    onTap: () => _onLikeTapped(index),
+                    child: Icon(
+                      Icons.thumb_up_alt_outlined,
+                      size: 20,
+                      color: isLiked ? Colors.blue : Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _onDislikeTapped(index),
+                    child: Icon(
+                      Icons.thumb_down_alt_outlined,
+                      size: 20,
+                      color: isDisliked ? Colors.red : Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.fromLTRB(15, 5, 0, 5),
@@ -87,9 +103,13 @@ Widget postCard({
                       onTap: () {
                         Navigator.pushNamed(context, '/comment');
                       },
-                      child: const Text(
-                          "Say Something..."
-                      ),
+                       child: const Text(
+                          "Say Something...",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
+                        ),
                     ),
                   ),
                   // child: TextField(
