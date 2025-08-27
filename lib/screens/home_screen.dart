@@ -32,12 +32,10 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      
       body: HomeScreen(),
     );
   }
 }
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -190,14 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              height: 200,
-              width: double.infinity,
-              color: verified ? Colors.green.shade200 : Colors.blue.shade200,
-              child: Center(
-                child: Icon(imageIcon, size: 80, color: Colors.white),
-              ),
-            ),
+            // The image container is now removed.
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
