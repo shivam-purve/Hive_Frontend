@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_garbage/screens/comment.dart';
 
 import 'home.dart';
 
@@ -14,6 +15,9 @@ class MyApp extends StatelessWidget {
     // TODO: implement build
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+        routes: {
+          '/comment': (context) => const Comment(),
+        },
       home: Home()
     );
   }

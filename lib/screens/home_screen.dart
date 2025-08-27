@@ -172,22 +172,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Icon(Icons.thumb_up_alt_outlined, size: 20),
                   const SizedBox(width: 8),
-                  const Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Say Something...",
-                        hintStyle: TextStyle(fontSize: 13),
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(25)),
-                          borderSide: BorderSide.none,
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(15, 5, 0, 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/comment');
+                        },
+                        child: const Text(
+                          "Say Something..."
                         ),
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 240, 240, 240),
                       ),
                     ),
+                    // child: TextField(
+                    //   decoration: InputDecoration(
+                    //     hintText: "Say Something...",
+                    //     hintStyle: TextStyle(fontSize: 13),
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.symmetric(
+                    //         horizontal: 10, vertical: 8),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.all(Radius.circular(25)),
+                    //       borderSide: BorderSide.none,
+                    //     ),
+                    //     filled: true,
+                    //     fillColor: Color.fromARGB(255, 240, 240, 240),
+                    //   ),
+                    // ),
                   ),
                   const SizedBox(width: 8),
                   const Icon(Icons.send_outlined, size: 20),
