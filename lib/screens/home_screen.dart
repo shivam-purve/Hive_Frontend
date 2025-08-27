@@ -1,27 +1,64 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Social App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      
+      body: HomeScreen(),
+    );
+  }
+}
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreen();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreen extends State<HomeScreen> {
-  
+class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> _posts = [
     {
       "profileName": "OpenAI",
       "verified": true,
       "description": "Turn Ideas Into Images with ChatGPT. Describe anything - like “Dhruv sitting in Library” and watch it appear. Try it out!",
-      "imagePath": "assets/chatgpt.png",
+      "imageIcon": Icons.chat_bubble_outline,
     },
     {
-      "profileName": "Reddit",
+      "profileName": "MrBean",
       "verified": false,
       "description": "Watch out my newly Launched series, with much more comedy only on Amazon Prime, Netflix and Disney+ Hotstar!",
-      "imagePath": "assets/reddit.png",
+      "imageIcon": Icons.live_tv,
     },
   ];
 
@@ -70,16 +107,14 @@ class _HomeScreen extends State<HomeScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                
-                itemCount: 1000,
+                itemCount: _posts.length * 10,
                 itemBuilder: (context, index) {
-                  
                   final post = _posts[index % _posts.length];
                   return postCard(
                     profileName: post["profileName"],
                     verified: post["verified"],
                     description: post["description"],
-                    imagePath: post["imagePath"],
+                    imageIcon: post["imageIcon"],
                   );
                 },
               ),
@@ -90,14 +125,12 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  
   Widget postCard({
     required String profileName,
     required bool verified,
     required String description,
-    required String imagePath,
+    required IconData imageIcon,
   }) {
-    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Card(
@@ -157,11 +190,12 @@ class _HomeScreen extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
+            Container(
+              height: 200,
+              width: double.infinity,
+              color: verified ? Colors.green.shade200 : Colors.blue.shade200,
+              child: Center(
+                child: Icon(imageIcon, size: 80, color: Colors.white),
               ),
             ),
             Padding(
@@ -170,18 +204,20 @@ class _HomeScreen extends State<HomeScreen> {
                 children: [
                   const Icon(Icons.thumb_up_alt_outlined, size: 20),
                   const SizedBox(width: 8),
-                  Expanded(
+                  const Expanded(
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: "Say Something...",
-                        hintStyle: const TextStyle(fontSize: 13),
+                        hintStyle: TextStyle(fontSize: 13),
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.all(Radius.circular(25)),
+                          borderSide: BorderSide.none,
                         ),
+                        filled: true,
+                        fillColor: Color.fromARGB(255, 240, 240, 240),
                       ),
                     ),
                   ),
