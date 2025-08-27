@@ -9,85 +9,95 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
+  
+  final List<Map<String, dynamic>> _posts = [
+    {
+      "profileName": "OpenAI",
+      "verified": true,
+      "description": "Turn Ideas Into Images with ChatGPT. Describe anything - like “Dhruv sitting in Library” and watch it appear. Try it out!",
+      "imagePath": "assets/chatgpt.png",
+    },
+    {
+      "profileName": "Reddit",
+      "verified": false,
+      "description": "Watch out my newly Launched series, with much more comedy only on Amazon Prime, Netflix and Disney+ Hotstar!",
+      "imagePath": "assets/reddit.png",
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.menu),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.menu),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "Social Trash",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(width: 8), 
-                        const Text(
-                          "Social Trash",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-
-
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.search),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.people_alt_outlined),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.search),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.people_alt_outlined),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-
-              postCard(
-                profileName: "OpenAI",
-                verified: true,
-                description:
-                "Turn Ideas Into Images with ChatGPT. Describe anything - like “Dhruv sitting in Library” and watch it appear. Try it out!",
-                imagePath: "assets/chatgpt.png",
+            ),
+            Expanded(
+              child: ListView.builder(
+                
+                itemCount: 1000,
+                itemBuilder: (context, index) {
+                  
+                  final post = _posts[index % _posts.length];
+                  return postCard(
+                    profileName: post["profileName"],
+                    verified: post["verified"],
+                    description: post["description"],
+                    imagePath: post["imagePath"],
+                  );
+                },
               ),
-
-              postCard(
-                profileName: "Reddit",
-                verified: false,
-                description:
-                "Watch out my newly Launched series, with much more comedy only on Amazon Prime, Netflix and Disney+ Hotstar!",
-                imagePath: "assets/reddit.png",
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-
+  
   Widget postCard({
     required String profileName,
     required bool verified,
     required String description,
     required String imagePath,
   }) {
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Card(
@@ -96,7 +106,6 @@ class _HomeScreen extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -140,8 +149,6 @@ class _HomeScreen extends State<HomeScreen> {
                 ],
               ),
             ),
-
-            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
@@ -149,10 +156,7 @@ class _HomeScreen extends State<HomeScreen> {
                 style: const TextStyle(fontSize: 14),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.asset(
@@ -160,8 +164,6 @@ class _HomeScreen extends State<HomeScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
