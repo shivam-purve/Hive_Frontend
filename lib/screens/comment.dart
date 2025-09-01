@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../colors_theme/color.dart';
+
 class Comment extends StatefulWidget {
   const Comment({super.key});
 
@@ -110,6 +112,7 @@ class _CommentState extends State<Comment> with AutomaticKeepAliveClientMixin<Co
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Comments",
@@ -123,6 +126,7 @@ class _CommentState extends State<Comment> with AutomaticKeepAliveClientMixin<Co
           children: [
             Expanded(
               child: ListView.builder(
+
                 controller: _scrollController,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 itemCount: _comments.length + (_isLoadingMore ? 1 : 0),
@@ -178,10 +182,10 @@ class _CommentState extends State<Comment> with AutomaticKeepAliveClientMixin<Co
                       padding: const EdgeInsets.all(12),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.deepPurple,
+                        color: Colors.black,
                       ),
                       child: const Icon(Icons.send,
-                          color: Colors.white, size: 20),
+                          color: AppColors.primary, size: 20),
                     ),
                   ),
                 ],
