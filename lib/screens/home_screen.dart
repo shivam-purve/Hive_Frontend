@@ -67,6 +67,19 @@ class _HomeScreenState extends State<HomeScreen> {
       "imageIcon": Icons.live_tv,
     },
   ];
+  void _onLikeTapped(int index) {
+    setState(() {
+      _posts[index]["isLiked"] = !_posts[index]["isLiked"];
+      _posts[index]["isDisliked"] = false;
+    });
+  }
+
+  void _onDislikeTapped(int index) {
+    setState(() {
+      _posts[index]["isDisliked"] = !_posts[index]["isDisliked"];
+      _posts[index]["isLiked"] = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
