@@ -12,7 +12,7 @@ class PostCard extends StatefulWidget {
     required this.profileName,
     required this.verified,
     required this.description,
-    required this.imageIcon,
+    required this.imageIcon, required BuildContext context,
   });
 
   @override

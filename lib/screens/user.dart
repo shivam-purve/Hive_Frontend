@@ -133,7 +133,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               itemCount: _posts.length * 10,
               itemBuilder: (context, index) {
                 final post = _posts[index % _posts.length];
-                return postCard(
+                return PostCard(
                   context : context,
                   profileName: post["profileName"],
                   verified: post["verified"],
