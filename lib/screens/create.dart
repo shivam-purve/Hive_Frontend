@@ -32,7 +32,7 @@ class _CreateState extends State<Create> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: 60.0), 
+          padding: const EdgeInsets.only(top:20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -108,6 +108,7 @@ class _CreateState extends State<Create> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
+
                       child: TextFormField(
                         controller: _textController,
                         maxLines: null,
@@ -116,7 +117,7 @@ class _CreateState extends State<Create> {
                           hintText: "Enter your text here to check...",
                           hintStyle: TextStyle(
                             color: Color.fromARGB(255, 81, 81, 81),
-                            fontSize: 16, 
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -149,7 +150,7 @@ class _CreateState extends State<Create> {
                 child: Column(
                   children: const [
                     Text(
-                      "✨ Our AI is continuously filtering out spam, toxic, and unsafe posts.",
+                      "✨ Our Model is continuously analysing and filtering out spam, toxic, and unsafe posts.",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

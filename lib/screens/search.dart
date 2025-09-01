@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../colors_theme/color.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -82,11 +84,13 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: const Text("Search Posts",
             style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -141,6 +145,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   final post = _filteredPosts[index];
                   return Card(
+                    shadowColor: Colors.transparent,
+                    color: AppColors.primary_light,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     margin: const EdgeInsets.symmetric(vertical: 8),

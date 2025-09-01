@@ -29,7 +29,7 @@ class _Home extends State<Home> {
 
   List screenList = [
     HomeScreen(),
-    const Navigation(),
+    const SearchScreen(),
     const Create(),
     const Notifs(),
     const UserProfilePage()
@@ -39,9 +39,11 @@ class _Home extends State<Home> {
     return Scaffold(
         backgroundColor: Colors.white,
         drawer: Drawer(
+          backgroundColor: Colors.white,
         ),
         body: screenList[_selectedIndex],
         appBar: AppBar(
+          scrolledUnderElevation: 0,
             leading: Builder(
               builder: (context) => Padding(
                 padding: const EdgeInsets.only(left : 13.0),
@@ -56,8 +58,9 @@ class _Home extends State<Home> {
                   color: Colors.black,
                   fontSize: 25,
                   fontWeight: FontWeight.w700
-              ),),
-            backgroundColor: Colors.white
+              ),
+            ),
+            backgroundColor: Colors.white,
         ),
         bottomNavigationBar: SizedBox(
           height: 94,
