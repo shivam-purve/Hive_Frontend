@@ -10,7 +10,10 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends State<NotificationsPage> with AutomaticKeepAliveClientMixin<NotificationsPage>{
+  @override
+  bool get wantKeepAlive => true;
+
   final List<AppNotification> _notifications = [
     AppNotification(
       title: "New Message",
@@ -31,6 +34,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -90,4 +94,5 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
     );
   }
+
 }

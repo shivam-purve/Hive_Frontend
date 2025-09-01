@@ -7,7 +7,9 @@ class Comment extends StatefulWidget {
   State<Comment> createState() => _CommentState();
 }
 
-class _CommentState extends State<Comment> {
+class _CommentState extends State<Comment> with AutomaticKeepAliveClientMixin<Comment> {
+  @override
+  bool get wantKeepAlive => true;
   final List<Map<String, dynamic>> _comments = [
     {
       "author": "TechExpert",
@@ -106,6 +108,7 @@ class _CommentState extends State<Comment> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(

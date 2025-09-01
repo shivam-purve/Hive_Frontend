@@ -21,19 +21,30 @@ class _Home extends State<Home> {
   final int _underReviewPercent = 10;
   late final int _flaggedPecentage = 100 - _safePercent - _underReviewPercent;
   int _selectedIndex = 0;
-  void _NavigationBottomBar(int index) {
-    setState(() {
-        _selectedIndex = index;
-    });
+
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    _pageController = PageController(initialPage: _selectedIndex);
+    super.initState();
   }
 
-  List screenList = [
+  List<Widget> screenList = [
     HomeScreen(),
     const SearchScreen(),
     const Create(),
     NotificationsPage(),
     const UserProfilePage()
   ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +52,11 @@ class _Home extends State<Home> {
         drawer: Drawer(
           backgroundColor: Colors.white,
         ),
-        body: screenList[_selectedIndex],
+        body: PageView(
+          controller: _pageController,
+          physics: NeverScrollableScrollPhysics(),
+          children: screenList,
+        ),
         appBar: AppBar(
           scrolledUnderElevation: 0,
             leading: Builder(
@@ -66,7 +81,12 @@ class _Home extends State<Home> {
           height: 94,
           child: BottomNavigationBar(
             currentIndex: _selectedIndex,
-            onTap: _NavigationBottomBar,
+            onTap: (selectedIndex) {
+              setState(() {
+                _selectedIndex = selectedIndex;
+                _pageController.jumpToPage(selectedIndex);
+              });
+            },
             type: BottomNavigationBarType.fixed,
             iconSize: 23,
             backgroundColor: Color.fromARGB(255, 254, 198, 41),

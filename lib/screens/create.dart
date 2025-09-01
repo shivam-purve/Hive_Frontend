@@ -8,7 +8,10 @@ class Create extends StatefulWidget {
   State<Create> createState() => _CreateState();
 }
 
-class _CreateState extends State<Create> {
+class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Create>{
+  @override
+  bool get wantKeepAlive => true;
+
   final TextEditingController _textController = TextEditingController();
 
   @override
@@ -33,6 +36,7 @@ class _CreateState extends State<Create> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

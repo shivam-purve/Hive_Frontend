@@ -36,9 +36,13 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with AutomaticKeepAliveClientMixin<MainScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return const Scaffold(
       body: HomeScreen(),
     );
@@ -52,7 +56,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen> {
+  @override
+  bool get wantKeepAlive => true;
   final List<Map<String, dynamic>> _posts = [
     {
       "profileName": "OpenAI",
@@ -83,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
