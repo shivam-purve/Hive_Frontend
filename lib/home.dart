@@ -31,7 +31,7 @@ class _Home extends State<Home> {
     HomeScreen(),
     const SearchScreen(),
     const Create(),
-    const Notifs(),
+    NotificationsPage(),
     const UserProfilePage()
   ];
   @override

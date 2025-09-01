@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_garbage/notifs/noti_service.dart';
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -19,6 +20,10 @@ class _CreateState extends State<Create> {
   void _onSendPressed() {
     String enteredText = _textController.text.trim();
     if (enteredText.isNotEmpty) {
+      NotiService().showNotification(
+        title: "Message Queued Successfully!",
+        body: "Your message has been queued for analysis."
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("You entered: $enteredText")),
       );
