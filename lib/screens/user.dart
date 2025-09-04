@@ -25,7 +25,9 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../main.dart';
 import '../widgets/post_card.dart';
 
 void main() {
@@ -79,6 +81,7 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
 
   final String user_name = "Mritunjay Tiwari";
 
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -108,6 +111,29 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
                       ],
                     ),
                   ),
+                  ElevatedButton(onPressed: () async {
+                    try {
+                      // 1. Sign out from Supabase
+                      await Supabase.instance.client.auth.signOut();
+
+                      // 2. Disconnect from Google
+                      await googleSignIn.disconnect();
+
+                      // 3. Also sign out from Google session
+                      await googleSignIn.signOut();
+
+                      print("Signed out successfully");
+
+                      // 4. Redirect to login screen
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                            (route) => false, // removes all previous routes
+                      );
+                    } catch (e) {
+                      print("Error during sign out: $e");
+                    }
+                  }, child: const Text("Sign Out"))
                 ],
               ),
             ),
