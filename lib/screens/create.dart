@@ -1,6 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_garbage/notifs/noti_service.dart';
 import 'package:social_garbage/services/post_service.dart';
+
+import '../main.dart';
+import '../services/api_client.dart';
 
 
 class Create extends StatefulWidget {
@@ -35,14 +43,33 @@ class _CreateState extends State<Create>
       // final newPost = await PostService().createPost(enteredText);
 
       // 🔹 Show local notification for UX feedback
-      NotiService().showNotification(
-        title: "Post Queued Successfully!",
-        body: "Your post is being analyzed by our system.",
+      final prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString('accessToken');
+      final url = Uri.parse("$kBaseUrl/post/");
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken", // auth header
+        },
+        body: jsonEncode({
+          "content": enteredText,
+        }),
       );
 
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception("Failed to create post: ${response.body} + ${response.statusCode} + $accessToken");
+      }
+      // NotiService().showNotification(
+      //   title: "Post Queued Successfully!",
+      //   body: "Your post is being analyzed by our system.",
+      // );
+      //
       // if (!mounted) return;
       // ScaffoldMessenger.of(context).showSnackBar(
-        // SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
+      //   SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
       // );
 
       _textController.clear();

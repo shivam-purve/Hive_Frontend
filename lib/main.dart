@@ -37,8 +37,10 @@ import 'package:http/http.dart' as http;
 import 'package:social_garbage/screens/comment.dart';
 import 'package:social_garbage/services/api_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+H// import 'package:uni_links/uni_links.dart';
 import 'home.dart';
 import 'notifs/noti_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn(
   serverClientId: '1054235009294-au7ct1olifehpfabqmo068d2pshrba8p.apps.googleusercontent.com',
@@ -61,6 +63,7 @@ Future<void> main() async {
 
 final supabase = Supabase.instance.client;
 GoogleSignInAccount? googleUser;
+GoogleSignInAuthentication? googleAuth;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -87,6 +90,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String? _userId;
+  // StreamSubscription? _sub;
   final _formKey = GlobalKey<FormState>();
   String email = "", password = "";
 
@@ -106,14 +110,24 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     _setupAuthListener();
     super.initState();
-
+    // _sub = uriLinkStream.listen((Uri? uri) {
+    //   if (uri != null && uri.scheme == 'myapp' && uri.host == 'login-callback') {
+    //     final accessToken = uri.queryParameters['access_token'];
+    //     final idToken = uri.queryParameters['id_token'];
+    //     // Use these tokens to log in your app / backend
+    //   }
+    // });
     // supabase.auth.onAuthStateChange.listen((data) {
     //   setState(() {
     //     _userId = data.session?.user.id;
     //   });
     // });
+  }
 
-
+  @override
+  void dispose() {
+    // _sub?.cancel();
+    super.dispose();
   }
 
   // @override
@@ -278,47 +292,138 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    final navigator = Navigator.of(context);
 
-                    unawaited(showDialog(context: context,
-                        barrierDismissible: false,
-                        builder: (_) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                    ));
-                    final googleUser = await googleSignIn.signIn();
-                    final googleAuth = await googleUser!.authentication;
-                    final accessToken = googleAuth.accessToken;
-                    final idToken = googleAuth.idToken;
+                    // try {
+                    //   // 1. Trigger Google OAuth sign-in via Supabase
+                    //   await supabase.auth.signInWithOAuth(
+                    //     OAuthProvider.google,
+                    //     // redirectTo: 'yourapp://login-callback', // optional
+                    //   );
+                    //
+                    //   // 2. Get the current session
+                    //   final session = supabase.auth.currentSession;
+                    //
+                    //   // 3. Check if the user signed in successfully
+                    //   if (session == null) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(content: Text("Sign-in process was cancelled.")),
+                    //     );
+                    //     return;
+                    //   }
+                    //
+                    //   // 4. Get the Supabase access token
+                    //   final supabaseAccessToken = session.accessToken;
+                    //   if (supabaseAccessToken == null) {
+                    //     throw 'Error: Could not retrieve session token after sign-in.';
+                    //   }
+                    //
+                    //   // 5. Optional: Pop a loading dialog if you showed one
+                    //   if (Navigator.canPop(context)) {
+                    //     Navigator.of(context).pop();
+                    //   }
+                    //
+                    //   // 6. Make the POST request to your backend with the Supabase JWT
+                    //   final url = Uri.parse("$kBaseUrl/user/defaults");
+                    //   final response = await http.post(
+                    //     url,
+                    //     headers: {
+                    //       "Content-Type": "application/json",
+                    //       "Authorization": "Bearer $supabaseAccessToken",
+                    //     },
+                    //   );
+                    //
+                    //   // 7. Show the result in a SnackBar
+                    //   if (!context.mounted) return;
+                    //   if (response.statusCode == 200) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(content: Text("✅ Successfully set up user!")),
+                    //     );
+                    //   } else {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       SnackBar(content: Text("❌ Failed to create post: ${response.body}")),
+                    //     );
+                    //   }
+                    // } catch (e) {
+                    //   // 8. Handle errors
+                    //   if (!context.mounted) return;
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(content: Text("❌ An error occurred: $e")),
+                    //   );
+                    // }
 
-                    if (accessToken == null) {
-                      throw 'No Access Token found.';
-                    }
-                    if (idToken == null) {
-                      throw 'No ID Token found.';
-                    }
-                    navigator.pop();
-                    await supabase.auth.signInWithIdToken(
-                      provider: OAuthProvider.google,
-                      idToken: idToken,
-                      accessToken: accessToken,
+
+                    // 1️⃣ Start OAuth flow
+                    await supabase.auth.signInWithOAuth(
+                      OAuthProvider.google,
                     );
 
-                    final url = Uri.parse("$kBaseUrl/defaults");
+// 2️⃣ Get the current session after sign-in
+                    final session = supabase.auth.currentSession;
+
+// 3️⃣ Access Supabase JWT safely
+                    final supabaseToken = session?.accessToken;
+
+                    if (supabaseToken == null) {
+                      throw 'Error: Could not retrieve Supabase session token';
+                    }
+
+// 4️⃣ Use supabaseToken to call backend
                     final response = await http.post(
-                      url,
+                      Uri.parse("$kBaseUrl/user/defaults"),
                       headers: {
+                        "Authorization": "Bearer $supabaseToken",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer ${googleAuth.accessToken}", // send in header
                       },
                     );
 
-                    if (response.statusCode == 200) {
-                      final data = jsonDecode(response.body);
-                      return data; // could be { access_token, user, ... }
-                    } else {
-                      throw Exception("Login failed: ${response.body}");
-                    }
+                    // final navigator = Navigator.of(context);
+                    //
+                    // unawaited(showDialog(context: context,
+                    //     barrierDismissible: false,
+                    //     builder: (_) {
+                    //       return Center(child: CircularProgressIndicator());
+                    //     }
+                    // ));
+                    // final googleUser = await googleSignIn.signIn();
+                    // final googleAuth = await googleUser!.authentication;
+                    // final accessToken = googleAuth.accessToken;
+                    // final idToken = googleAuth.idToken;
+                    // final prefs = await SharedPreferences.getInstance();
+                    // await prefs.setString('accessToken', accessToken!);
+                    // if (idToken == null) {
+                    //   throw 'No ID Token found.';
+                    // }
+                    // navigator.pop();
+                    //
+                    // final url = Uri.parse("$kBaseUrl/user/defaults");
+                    // final response = await http.post(
+                    //   url,
+                    //   headers: {
+                    //     "Content-Type": "application/json",
+                    //     "Authorization": "Bearer ${googleAuth.accessToken}", // send in header
+                    //   },
+                    // );
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(content: Text(" post: $accessToken")));
+                    // await supabase.auth.signInWithIdToken(
+                    //   provider: OAuthProvider.google,
+                    //   idToken: idToken,
+                    //   accessToken: accessToken,
+                    // );
+                    //
+                    //
+                    //
+                    // if (response.statusCode == 200) {
+                    //   final data = jsonDecode(response.body);
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(content: Text("❌ Failed to create post: ${response.statusCode}")),
+                    //   );
+                    //   return data; // could be { access_token, user, ... }
+                    // } else {
+                    //   throw Exception("Login failed: ${response.body}");
+                    // }
+
+
                   }
                 )
               ],
