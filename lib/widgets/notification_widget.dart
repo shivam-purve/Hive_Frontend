@@ -37,9 +37,7 @@ class NotificationItem extends StatelessWidget {
       color: AppColors.primary_light,
       elevation: 0,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         tileColor: Colors.transparent,
         title: Text(

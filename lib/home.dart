@@ -10,7 +10,6 @@ import 'package:hive/screens/user.dart';
 class Home extends StatefulWidget {
   const Home({super.key});
 
-
   @override
   State<Home> createState() => _Home();
 }
@@ -34,7 +33,7 @@ class _Home extends State<Home> {
     const SearchScreen(),
     const Create(),
     NotificationsPage(),
-    const UserProfilePage()
+    const UserProfilePage(),
   ];
 
   @override
@@ -47,77 +46,74 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      drawer: Drawer(backgroundColor: Colors.white),
+      body: PageView(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        children: screenList,
+      ),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        leading: Builder(
+          builder: (context) => Padding(
+            padding: const EdgeInsets.only(left: 13.0),
+            child: IconButton(
+              icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+        ),
+        title: Text(
+          "Hive",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         backgroundColor: Colors.white,
-        drawer: Drawer(
-          backgroundColor: Colors.white,
-        ),
-        body: PageView(
-          controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: screenList,
-        ),
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          leading: Builder(
-            builder: (context) => Padding(
-              padding: const EdgeInsets.only(left : 13.0),
-              child: IconButton(
-                icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 94,
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (selectedIndex) {
+            setState(() {
+              _selectedIndex = selectedIndex;
+              _pageController.jumpToPage(selectedIndex);
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          iconSize: 23,
+          backgroundColor: Color.fromARGB(255, 254, 198, 41),
+          selectedLabelStyle: TextStyle(),
+          unselectedItemColor: Colors.black,
+          selectedItemColor: Colors.black,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home),
+              label: "Home",
             ),
-          ),
-          title: Text("Hive",
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 25,
-                fontWeight: FontWeight.w700
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/compass.png')),
+              label: "Navigate",
             ),
-          ),
-          backgroundColor: Colors.white,
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/plus.png')),
+              label: "Create",
+            ),
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/bell.png')),
+              label: "Notifs",
+            ),
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/user.png')),
+              label: "User",
+            ),
+          ],
         ),
-        bottomNavigationBar: SizedBox(
-          height: 94,
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (selectedIndex) {
-              setState(() {
-                _selectedIndex = selectedIndex;
-                _pageController.jumpToPage(selectedIndex);
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            iconSize: 23,
-            backgroundColor: Color.fromARGB(255, 254, 198, 41),
-            selectedLabelStyle: TextStyle(),
-            unselectedItemColor: Colors.black,
-            selectedItemColor: Colors.black,
-            items: [
-              BottomNavigationBarItem(
-                  icon: const Icon(Icons.home),
-                  label: "Home"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/compass.png')),
-                  label: "Navigate"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/plus.png')),
-                  label: "Create"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/bell.png')),
-                  label: "Notifs"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/user.png')),
-                  label: "User"
-              ),
-
-            ],
-          ),
-        )
+      ),
     );
   }
-
 }

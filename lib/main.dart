@@ -27,7 +27,6 @@
 //   }
 // }
 
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -41,18 +40,19 @@ import 'home.dart';
 import 'notifs/noti_service.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn(
-  serverClientId: '1054235009294-au7ct1olifehpfabqmo068d2pshrba8p.apps.googleusercontent.com',
+  serverClientId:
+      '1054235009294-au7ct1olifehpfabqmo068d2pshrba8p.apps.googleusercontent.com',
 );
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-      url: 'https://urgjympujyzkghpshrct.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2p5bXB1anl6a2docHNocmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTgyNTQsImV4cCI6MjA3MTc3NDI1NH0.NbuZIxH9-jTBoL9OCML0bxUlplY7pzGXA25orw9nhIo',
+    url: 'https://urgjympujyzkghpshrct.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2p5bXB1anl6a2docHNocmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTgyNTQsImV4cCI6MjA3MTc3NDI1NH0.NbuZIxH9-jTBoL9OCML0bxUlplY7pzGXA25orw9nhIo',
     // url: 'https://jkchajftfotdjrnfeuwv.supabase.co',
     // anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprY2hhamZ0Zm90ZGpybmZldXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5OTQzOTksImV4cCI6MjA3MjU3MDM5OX0.5CDJ6bq_VIM-a2pD7W3Asvpiu_vLvqG7F3vM6oyewpQ',
   );
-
 
   //Init notifications
   NotiService().initNotification();
@@ -69,15 +69,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        routes: {
-          '/comment': (context) => const Comment(),
-        },
-        home: LoginScreen()
+      debugShowCheckedModeBanner: false,
+      routes: {'/comment': (context) => const Comment()},
+      home: LoginScreen(),
     );
   }
 }
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -119,22 +116,20 @@ class _LoginScreenState extends State<LoginScreen> {
               // Successfully set up user, navigate to home
               if (context.mounted) {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const Home(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const Home()),
                 );
               }
             } else {
               // Backend call failed but user is authenticated
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("⚠️ User setup failed: ${response.body}")),
+                  SnackBar(
+                    content: Text("⚠️ User setup failed: ${response.body}"),
+                  ),
                 );
                 // Still navigate to home as user is authenticated
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const Home(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const Home()),
                 );
               }
             }
@@ -142,27 +137,28 @@ class _LoginScreenState extends State<LoginScreen> {
             // No token available
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("❌ Authentication failed: No token")),
+                const SnackBar(
+                  content: Text("❌ Authentication failed: No token"),
+                ),
               );
             }
           }
         } catch (e) {
           // Handle any errors during backend call
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("❌ Error: $e")),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("❌ Error: $e")));
             // Still navigate to home as user is authenticated
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const Home(),
-              ),
+              MaterialPageRoute(builder: (context) => const Home()),
             );
           }
         }
       }
     });
   }
+
   @override
   void initState() {
     _setupAuthListener();
@@ -319,14 +315,16 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Image(image: AssetImage("assets/icons/hive_logo.png"), height: 200,),
+                const Image(
+                  image: AssetImage("assets/icons/hive_logo.png"),
+                  height: 200,
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   "Login",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 30),
-
 
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -337,10 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     minimumSize: const Size.fromHeight(50),
                   ),
-                  icon: Image.asset(
-                    "assets/icons/google.png",
-                    height: 24,
-                  ),
+                  icon: Image.asset("assets/icons/google.png", height: 24),
                   label: const Text(
                     "Sign in with Google",
                     style: TextStyle(
@@ -354,9 +349,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       showDialog(
                         context: context,
                         barrierDismissible: false,
-                        builder: (context) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
                       );
 
                       // Start OAuth flow - this will open browser/WebView
@@ -367,7 +361,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // The auth listener will handle the redirect and navigation
                       // No need to manually check session here as OAuth is asynchronous
-                      
                     } catch (e) {
                       // Hide loading indicator
                       if (context.mounted) {
@@ -377,8 +370,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       }
                     }
-                  }
-                )
+                  },
+                ),
               ],
             ),
           ),
@@ -426,6 +419,3 @@ class UserService {
     return response;
   }
 }
-
-
-
