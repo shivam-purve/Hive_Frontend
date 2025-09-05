@@ -5,9 +5,9 @@ class NotiService {
 
   bool _isInitialized = false;
 
-  bool get inInitialized => _isInitialized;
+  bool get isInitialized => _isInitialized;
 
-  //Initialize Notification
+  // Initialize Notification
   Future<void> initNotification() async {
     if (_isInitialized) return;
 
@@ -27,13 +27,20 @@ class NotiService {
 
     await notificationsPlugin.initialize(initSettings);
     _isInitialized = true;
+
+    // Extra for iOS 16+
+    await notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
-  //NOTIFICATION DETAIL SETUP
+  // Notification Detail Setup
   NotificationDetails notificationDetails() {
     return const NotificationDetails(
       android: AndroidNotificationDetails(
-        'daily_channel_id', 'Daily Notifications',
+        'daily_channel_id',
+        'Daily Notifications',
         channelDescription: 'Daily notification channel',
         importance: Importance.max,
         priority: Priority.high,
@@ -42,17 +49,17 @@ class NotiService {
     );
   }
 
-    //SHOW NOTIFICATIONS
-    Future<void> showNotification({
-      int id =0,
-      String? title,
-      String? body,
-    }) async {
-      return notificationsPlugin.show(
-        id,
-        title,
-        body,
-        notificationDetails(),
-      );
-    }
+  // Show Notification
+  Future<void> showNotification({
+    int id = 0,
+    String? title,
+    String? body,
+  }) async {
+    await notificationsPlugin.show(
+      id,
+      title,
+      body,
+      notificationDetails(),
+    );
+  }
 }

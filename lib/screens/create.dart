@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_garbage/notifs/noti_service.dart';
+import 'package:social_garbage/services/post_service.dart';
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -8,11 +9,13 @@ class Create extends StatefulWidget {
   State<Create> createState() => _CreateState();
 }
 
-class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Create>{
+class _CreateState extends State<Create>
+    with AutomaticKeepAliveClientMixin<Create> {
   @override
   bool get wantKeepAlive => true;
 
   final TextEditingController _textController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -20,17 +23,35 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
     super.dispose();
   }
 
-  void _onSendPressed() {
-    String enteredText = _textController.text.trim();
-    if (enteredText.isNotEmpty) {
+  Future<void> _onSendPressed() async {
+    final enteredText = _textController.text.trim();
+    if (enteredText.isEmpty) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      // 🔹 Call backend API to create post
+      final newPost = await PostService().createPost(enteredText);
+
+      // 🔹 Show local notification for UX feedback
       NotiService().showNotification(
-        title: "Message Queued Successfully!",
-        body: "Your message has been queued for analysis."
+        title: "Post Queued Successfully!",
+        body: "Your post is being analyzed by our system.",
       );
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("You entered: $enteredText")),
+        SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
       );
+
       _textController.clear();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ Failed to create post: $e")),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -41,11 +62,11 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top:20.0),
+          padding: const EdgeInsets.only(top: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
+              // Stats Section
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -61,10 +82,14 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
                   children: [
                     Row(
                       children: [
-                        const ImageIcon(
-                          AssetImage("assets/icons/information.png"),
-                          size: 35,
-                          color: Color.fromARGB(255, 254, 198, 41),
+                        Flexible(
+                          child: Image.asset(
+                            "assets/icons/information.png",
+                            width: 35,
+                            height: 35,
+                            color: const Color.fromARGB(255, 254, 198, 41),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                         const SizedBox(width: 15),
                         const Text(
@@ -103,7 +128,7 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
                 color: Color.fromARGB(255, 215, 215, 215),
               ),
 
-              
+              // Input Section
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -117,10 +142,10 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-
                       child: TextFormField(
                         controller: _textController,
                         maxLines: null,
+                        enabled: !_isSubmitting,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "Enter your text here to check...",
@@ -137,22 +162,34 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
                       ),
                     ),
                     IconButton(
-                      icon: const ImageIcon(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: _isSubmitting
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color.fromARGB(255, 254, 198, 41),
+                        ),
+                      )
+                          : const ImageIcon(
                         AssetImage("assets/icons/send.png"),
                         size: 28,
                         color: Color.fromARGB(255, 254, 198, 41),
                       ),
-                      onPressed: _onSendPressed,
+                      onPressed: _isSubmitting ? null : _onSendPressed,
                     ),
                   ],
                 ),
               ),
 
-              
               const Divider(
                 thickness: 2,
                 color: Color.fromARGB(255, 215, 215, 215),
               ),
+
+              // Info Section
               Padding(
                 padding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -172,7 +209,8 @@ class _CreateState extends State<Create> with AutomaticKeepAliveClientMixin<Crea
                       value: null, // indeterminate loading
                       backgroundColor: Color.fromARGB(50, 254, 198, 41),
                       valueColor: AlwaysStoppedAnimation<Color>(
-                          Color.fromARGB(255, 254, 198, 41)),
+                        Color.fromARGB(255, 254, 198, 41),
+                      ),
                     ),
                   ],
                 ),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:google_fonts/google_fonts.dart';
@@ -59,23 +58,23 @@ class _Home extends State<Home> {
         ),
         appBar: AppBar(
           scrolledUnderElevation: 0,
-            leading: Builder(
-              builder: (context) => Padding(
-                padding: const EdgeInsets.only(left : 13.0),
-                child: IconButton(
-                  icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+          leading: Builder(
+            builder: (context) => Padding(
+              padding: const EdgeInsets.only(left : 13.0),
+              child: IconButton(
+                icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
+                onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
-            title: Text("Hive",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700
-              ),
+          ),
+          title: Text("Hive",
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.w700
             ),
-            backgroundColor: Colors.white,
+          ),
+          backgroundColor: Colors.white,
         ),
         bottomNavigationBar: SizedBox(
           height: 94,
@@ -122,4 +121,3 @@ class _Home extends State<Home> {
   }
 
 }
-
