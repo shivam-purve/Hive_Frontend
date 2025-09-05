@@ -51,7 +51,7 @@
 // }
 
 
-import 'package:social_garbage/main.dart';
+import 'package:hive/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PostService {

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:social_garbage/notifs/noti_service.dart';
-import 'package:social_garbage/services/post_service.dart';
+import 'package:hive/notifs/noti_service.dart';
+import 'package:hive/services/post_service.dart';
 
 import '../main.dart';
 import '../services/api_client.dart';

@@ -1,6 +1,6 @@
 {
-    "name": "social_garbage",
-    "short_name": "social_garbage",
+    "name": "hive",
+    "short_name": "hive",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#hexcode",

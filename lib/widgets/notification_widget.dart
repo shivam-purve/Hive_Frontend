@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_garbage/colors_theme/color.dart';
+import 'package:hive/colors_theme/color.dart';
 
 class AppNotification {
   final String id;

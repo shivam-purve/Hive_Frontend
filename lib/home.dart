@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:google_fonts/google_fonts.dart';
-import 'package:social_garbage/screens/create.dart';
-import 'package:social_garbage/screens/home_screen.dart';
-import 'package:social_garbage/screens/search.dart';
-import 'package:social_garbage/screens/notifs.dart';
-import 'package:social_garbage/screens/user.dart';
+import 'package:hive/screens/create.dart';
+import 'package:hive/screens/home_screen.dart';
+import 'package:hive/screens/search.dart';
+import 'package:hive/screens/notifs.dart';
+import 'package:hive/screens/user.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
