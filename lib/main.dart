@@ -29,10 +29,13 @@
 
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:social_garbage/screens/comment.dart';
+import 'package:social_garbage/services/api_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home.dart';
 import 'notifs/noti_service.dart';
@@ -301,7 +304,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       accessToken: accessToken,
                     );
 
+                    final url = Uri.parse("$kBaseUrl/defaults");
+                    final response = await http.post(
+                      url,
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer ${googleAuth.accessToken}", // send in header
+                      },
+                    );
 
+                    if (response.statusCode == 200) {
+                      final data = jsonDecode(response.body);
+                      return data; // could be { access_token, user, ... }
+                    } else {
+                      throw Exception("Login failed: ${response.body}");
+                    }
                   }
                 )
               ],
@@ -313,6 +330,44 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+class UserService {
+  final SupabaseClient _client = supabase;
+
+  /// Create or update user profile when they log in
+  Future<void> upsertUser({
+    required String uid,
+    required String fullName,
+    required String email,
+    String? username,
+    String? profilePicUrl,
+    String? bio,
+  }) async {
+    final response = await _client.from('users').upsert({
+      'uid': uid,
+      'full_name': fullName,
+      'email': email,
+      if (username != null) 'username': username,
+      if (profilePicUrl != null) 'profile_pic_url': profilePicUrl,
+      if (bio != null) 'bio': bio,
+    });
+
+    // Supabase just returns the inserted/updated row(s)
+    if (response == null) {
+      throw Exception("Failed to upsert user");
+    }
+  }
+
+  /// Fetch user profile
+  Future<Map<String, dynamic>?> getUser(String uid) async {
+    final response = await _client
+        .from('users')
+        .select()
+        .eq('uid', uid)
+        .maybeSingle();
+
+    return response;
+  }
+}
 
 
 

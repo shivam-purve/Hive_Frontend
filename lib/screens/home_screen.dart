@@ -29,11 +29,14 @@ class _HomeScreenState extends State<HomeScreen>
       if (!mounted) return;
       setState(() {
         _posts = posts.map((p) => {
-          "id": p["id"],
-          "profileName": p["author"]?["name"] ?? "Unknown",
-          "verified": p["verified"] ?? false,
+          "id": p["pid"], // post ID
+          "profileName": p["owner"]?["full_name"] ?? "Unknown",
+          "username": p["owner"]?["username"] ?? "",
+          "profilePic": p["owner"]?["profile_pic_url"],
+          "verified": p["verification_status"] ?? false,
           "description": p["content"] ?? "",
-          "imageIcon": Icons.article,
+          "likes": p["likes"] ?? 0,
+          "dislikes": p["dislikes"] ?? 0,
           "isLiked": false,
           "isDisliked": false,
         }).toList();
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen>
       );
     }
   }
+
 
   void _toggleLike(int index) async {
     final postId = _posts[index]["id"];

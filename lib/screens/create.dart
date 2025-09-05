@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_garbage/notifs/noti_service.dart';
 import 'package:social_garbage/services/post_service.dart';
 
+
 class Create extends StatefulWidget {
   const Create({super.key});
 
@@ -31,7 +32,7 @@ class _CreateState extends State<Create>
 
     try {
       // 🔹 Call backend API to create post
-      final newPost = await PostService().createPost(enteredText);
+      // final newPost = await PostService().createPost(enteredText);
 
       // 🔹 Show local notification for UX feedback
       NotiService().showNotification(
@@ -39,10 +40,10 @@ class _CreateState extends State<Create>
         body: "Your post is being analyzed by our system.",
       );
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
-      );
+      // if (!mounted) return;
+      // ScaffoldMessenger.of(context).showSnackBar(
+        // SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
+      // );
 
       _textController.clear();
     } catch (e) {
