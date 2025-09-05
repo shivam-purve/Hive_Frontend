@@ -355,6 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // 1️⃣ Start OAuth flow
                     await supabase.auth.signInWithOAuth(
                       OAuthProvider.google,
+                      redirectTo: "com.hive://login-callback",
                     );
 
 // 2️⃣ Get the current session after sign-in
