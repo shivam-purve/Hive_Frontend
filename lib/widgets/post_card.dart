@@ -1,41 +1,31 @@
 import 'package:flutter/material.dart';
-import '../colors_theme/color.dart'; 
+import '../colors_theme/color.dart';
 
-class PostCard extends StatefulWidget {
+class PostCard extends StatelessWidget {
   final String profileName;
   final bool verified;
   final String description;
   final IconData imageIcon;
+
+  final bool isLiked;
+  final bool isDisliked;
+
+  final VoidCallback onLike;
+  final VoidCallback onDislike;
+  final VoidCallback onComment;
 
   const PostCard({
     super.key,
     required this.profileName,
     required this.verified,
     required this.description,
-    required this.imageIcon, required BuildContext context,
+    required this.imageIcon,
+    required this.isLiked,
+    required this.isDisliked,
+    required this.onLike,
+    required this.onDislike,
+    required this.onComment,
   });
-
-  @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  bool isLiked = false;
-  bool isDisliked = false;
-
-  void _onLikeTapped() {
-    setState(() {
-      isLiked = !isLiked;
-      if (isLiked) isDisliked = false;
-    });
-  }
-
-  void _onDislikeTapped() {
-    setState(() {
-      isDisliked = !isDisliked;
-      if (isDisliked) isLiked = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +39,7 @@ class _PostCardState extends State<PostCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          
+            // Profile Row
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -64,7 +54,7 @@ class _PostCardState extends State<PostCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.profileName,
+                        profileName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -73,18 +63,16 @@ class _PostCardState extends State<PostCard> {
                       Row(
                         children: [
                           Icon(
-                            widget.verified ? Icons.verified : Icons.info,
-                            color: widget.verified ? Colors.green : Colors.orange,
+                            verified ? Icons.verified : Icons.info,
+                            color: verified ? Colors.green : Colors.orange,
                             size: 16,
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            widget.verified
-                                ? "Verified & Safe"
-                                : "Unverified Info",
+                            verified ? "Verified & Safe" : "Unverified Info",
                             style: TextStyle(
                               fontSize: 12,
-                              color: widget.verified ? Colors.green : Colors.orange,
+                              color: verified ? Colors.green : Colors.orange,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -96,24 +84,24 @@ class _PostCardState extends State<PostCard> {
               ),
             ),
 
-     
+            // Description
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                widget.description,
+                description,
                 style: const TextStyle(fontSize: 14),
               ),
             ),
 
             const SizedBox(height: 10),
 
+            // Actions (like, dislike, comment)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                
                   GestureDetector(
-                    onTap: _onLikeTapped,
+                    onTap: onLike,
                     child: Icon(
                       Icons.thumb_up_alt_outlined,
                       size: 20,
@@ -122,9 +110,8 @@ class _PostCardState extends State<PostCard> {
                   ),
                   const SizedBox(width: 8),
 
-              
                   GestureDetector(
-                    onTap: _onDislikeTapped,
+                    onTap: onDislike,
                     child: Icon(
                       Icons.thumb_down_alt_outlined,
                       size: 20,
@@ -141,9 +128,7 @@ class _PostCardState extends State<PostCard> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/comment');
-                        },
+                        onTap: onComment,
                         child: const Text(
                           "Say Something...",
                           style: TextStyle(
@@ -154,8 +139,8 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 8),
+
                   const Icon(Icons.send_outlined, size: 20),
                 ],
               ),

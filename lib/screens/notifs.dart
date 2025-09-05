@@ -18,17 +18,17 @@ class _NotificationsPageState extends State<NotificationsPage> with AutomaticKee
     AppNotification(
       title: "New Message",
       message: "You got a new message from John",
-      time: "10:30 AM",
+      time: "10:30 AM", id: '',
     ),
     AppNotification(
       title: "Reminder",
       message: "Don’t forget your meeting at 3 PM",
-      time: "9:00 AM",
+      time: "9:00 AM", id: '',
     ),
     AppNotification(
       title: "Update",
       message: "Your app has been updated successfully",
-      time: "Yesterday",
+      time: "Yesterday", id: '',
     ),
   ];
 

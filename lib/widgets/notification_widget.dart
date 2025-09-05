@@ -2,17 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:social_garbage/colors_theme/color.dart';
 
 class AppNotification {
+  final String id;
   final String title;
   final String message;
   final String time;
 
   AppNotification({
+    required this.id,
     required this.title,
     required this.message,
     required this.time,
   });
-}
 
+  /// Factory to parse API response
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    return AppNotification(
+      id: json['id'].toString(),
+      title: json['title'] ?? 'No Title',
+      message: json['message'] ?? '',
+      time: json['time'] ?? '',
+    );
+  }
+}
 
 class NotificationItem extends StatelessWidget {
   final AppNotification notification;

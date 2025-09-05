@@ -1,7 +1,7 @@
-
+// lib/screens/search.dart
 import 'package:flutter/material.dart';
-
 import '../colors_theme/color.dart';
+import '../services/search_service.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -10,40 +10,17 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClientMixin<SearchScreen>{
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin<SearchScreen> {
   @override
   bool get wantKeepAlive => true;
+
   final TextEditingController _searchController = TextEditingController();
   String _filter = "All";
 
-  // Mock Data
-  final List<Map<String, dynamic>> _posts = [
-    {
-      "username": "TechGuru",
-      "content": "Flutter makes cross-platform apps so easy! 🚀",
-      "status": "Safe"
-    },
-    {
-      "username": "Troll123",
-      "content": "This platform is useless 😂",
-      "status": "Flagged"
-    },
-    {
-      "username": "AI_Fan",
-      "content": "AI is revolutionizing the world, stay updated!",
-      "status": "Safe"
-    },
-    {
-      "username": "ReviewBot",
-      "content": "This comment is under manual check.",
-      "status": "Under Review"
-    },
-    {
-      "username": "SpammerGuy",
-      "content": "Click here for FREE money 💸 scam-link.com",
-      "status": "Flagged"
-    },
-  ];
+  final SearchService _searchService = SearchService();
+  List<Map<String, dynamic>> _posts = [];
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -51,22 +28,27 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
     super.dispose();
   }
 
-  List<Map<String, dynamic>> get _filteredPosts {
-    String query = _searchController.text.toLowerCase();
-    return _posts.where((post) {
-      bool matchesQuery = post["username"].toLowerCase().contains(query) ||
-          post["content"].toLowerCase().contains(query);
-
-      bool matchesFilter = (_filter == "All") || (post["status"] == _filter);
-
-      return matchesQuery && matchesFilter;
-    }).toList();
+  Future<void> _performSearch() async {
+    setState(() => _loading = true);
+    try {
+      final results = await _searchService.searchPosts(
+        query: _searchController.text,
+        status: _filter,
+      );
+      setState(() => _posts = results);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Search failed: $e")),
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   void _setFilter(String filter) {
-    setState(() {
-      _filter = filter;
-    });
+    setState(() => _filter = filter);
+    _performSearch();
   }
 
   Color _statusColor(String status) {
@@ -88,8 +70,10 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        title: const Text("Search Posts",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Search Posts",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -101,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
             // Search bar
             TextField(
               controller: _searchController,
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => _performSearch(),
               decoration: InputDecoration(
                 hintText: "Search usernames or posts...",
                 prefixIcon: const Icon(Icons.search, color: Colors.amber),
@@ -137,43 +121,64 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
 
             // Results
             Expanded(
-              child: _filteredPosts.isEmpty
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _posts.isEmpty
                   ? const Center(
-                child: Text("No results found 🔍",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500)),
+                child: Text(
+                  "No results found 🔍",
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
               )
                   : ListView.builder(
-                itemCount: _filteredPosts.length,
+                itemCount: _posts.length,
                 itemBuilder: (context, index) {
-                  final post = _filteredPosts[index];
+                  final post = _posts[index];
                   return Card(
                     shadowColor: Colors.transparent,
                     color: AppColors.primary_light,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     elevation: 2,
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: _statusColor(post["status"]),
+                        backgroundColor:
+                        _statusColor(post["moderation_status"] ??
+                            post["status"] ??
+                            "Safe"),
                         child: Text(
-                          post["username"][0].toUpperCase(),
-                          style: const TextStyle(color: Colors.white),
+                          (post["author"]?["name"] ??
+                              post["username"] ??
+                              "?")[0]
+                              .toUpperCase(),
+                          style:
+                          const TextStyle(color: Colors.white),
                         ),
                       ),
-                      title: Text(post["username"],
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold)),
+                      title: Text(
+                        post["author"]?["name"] ??
+                            post["username"] ??
+                            "Unknown",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(post["content"]),
+                          Text(post["content"] ?? ""),
                           const SizedBox(height: 4),
                           Text(
-                            post["status"],
+                            post["moderation_status"] ??
+                                post["status"] ??
+                                "Safe",
                             style: TextStyle(
-                              color: _statusColor(post["status"]),
+                              color: _statusColor(
+                                  post["moderation_status"] ??
+                                      post["status"] ??
+                                      "Safe"),
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),

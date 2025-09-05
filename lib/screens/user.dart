@@ -1,35 +1,6 @@
-//
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-//
-// class User extends StatefulWidget {
-//   const User({super.key});
-//
-//   @override
-//   State<User> createState() => _User();
-// }
-//
-// class _User extends State<User>{
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         backgroundColor: Colors.white,
-//       body: Center(
-//         child: Column(
-//           children: [Text("User")],
-//         ),
-//       ),
-//     );
-//   }
-//
-// }
-
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../main.dart';
 import '../widgets/post_card.dart';
-
+import '../services/user_service.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -38,34 +9,100 @@ class UserProfilePage extends StatefulWidget {
   State<UserProfilePage> createState() => _UserProfilePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAliveClientMixin<UserProfilePage> {
+class _UserProfilePageState extends State<UserProfilePage>
+    with AutomaticKeepAliveClientMixin<UserProfilePage> {
   @override
   bool get wantKeepAlive => true;
-  final List<Map<String, dynamic>> _posts = [
-    {
-      "profileName": "OpenAI",
-      "verified": true,
-      "description": "Turn Ideas Into Images with ChatGPT. Describe anything - like “Dhruv sitting in Library” and watch it appear. Try it out!",
-      "imageIcon": Icons.chat_bubble_outline,
-    },
-    {
-      "profileName": "MrBean",
-      "verified": false,
-      "description": "Watch out my newly Launched series, with much more comedy only on Amazon Prime, Netflix and Disney+ Hotstar!",
-      "imageIcon": Icons.live_tv,
-    },
-  ];
 
-  // Example post images (replace with backend API / DB later)
-  final List<String> posts = List.generate(
-      15, (index) => "https://picsum.photos/id/${index + 50}/200/200");
+  final UserService _userService = UserService();
 
-  final String user_name = "Mritunjay Tiwari";
+  Map<String, dynamic>? _user;
+  List<Map<String, dynamic>> _posts = [];
+  bool _loading = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = await _userService.getCurrentUser();
+      final posts = await _userService.getUserPosts(user['id'].toString());
+      if (!mounted) return;
+      setState(() {
+        _user = user;
+        _posts = posts
+            .map<Map<String, dynamic>>((p) => {
+          "id": p["id"],
+          "profileName": user["name"] ?? "User",
+          "verified": p["verified"] ?? false,
+          "description": p["content"] ?? "",
+          "imageIcon": Icons.article,
+          "isLiked": false,
+          "isDisliked": false,
+        })
+            .toList();
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load user data: $e")),
+      );
+    }
+  }
+
+  void _toggleLike(int index) async {
+    final postId = _posts[index]["id"];
+    setState(() {
+      _posts[index]["isLiked"] = !_posts[index]["isLiked"];
+      _posts[index]["isDisliked"] = false;
+    });
+
+    try {
+      await _userService.likePost(postId);
+    } catch (_) {
+      setState(() {
+        _posts[index]["isLiked"] = !_posts[index]["isLiked"];
+      });
+    }
+  }
+
+  void _toggleDislike(int index) async {
+    final postId = _posts[index]["id"];
+    setState(() {
+      _posts[index]["isDisliked"] = !_posts[index]["isDisliked"];
+      _posts[index]["isLiked"] = false;
+    });
+
+    try {
+      await _userService.dislikePost(postId);
+    } catch (_) {
+      setState(() {
+        _posts[index]["isDisliked"] = !_posts[index]["isDisliked"];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_user == null) {
+      return const Scaffold(
+        body: Center(child: Text("No user data found")),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -78,7 +115,10 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage(googleUser?.photoUrl ?? ""),
+                    backgroundImage: _user?['avatar'] != null
+                        ? NetworkImage(_user!['avatar'])
+                        : const AssetImage("assets/icons/user.png")
+                    as ImageProvider,
                   ),
                   const SizedBox(width: 20),
                   Expanded(
@@ -86,33 +126,13 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const _StatColumn(label: "Posts", count: "10"),
+                        _StatColumn(
+                          label: "Posts",
+                          count: _posts.length.toString(),
+                        ),
                       ],
                     ),
                   ),
-                  ElevatedButton(onPressed: () async {
-                    try {
-                      // 1. Sign out from Supabase
-                      await Supabase.instance.client.auth.signOut();
-
-                      // 2. Disconnect from Google
-                      await googleSignIn.disconnect();
-
-                      // 3. Also sign out from Google session
-                      await googleSignIn.signOut();
-
-                      print("Signed out successfully");
-
-                      // 4. Redirect to login screen
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (route) => false, // removes all previous routes
-                      );
-                    } catch (e) {
-                      print("Error during sign out: $e");
-                    }
-                  }, child: const Text("Sign Out"))
                 ],
               ),
             ),
@@ -125,28 +145,37 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("$user_name",
+                    Text(_user?['name'] ?? "Unknown",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 4),
-                    const Text("This is a short bio of the user."),
+                    Text(_user?['bio'] ?? "This user has no bio."),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 12),
+
+            // User Posts
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _posts.length * 10,
+              itemCount: _posts.length,
               itemBuilder: (context, index) {
-                final post = _posts[index % _posts.length];
+                final post = _posts[index];
                 return PostCard(
-                  context : context,
                   profileName: post["profileName"],
                   verified: post["verified"],
                   description: post["description"],
                   imageIcon: post["imageIcon"],
+                  isLiked: post["isLiked"],
+                  isDisliked: post["isDisliked"],
+                  onLike: () => _toggleLike(index),
+                  onDislike: () => _toggleDislike(index),
+                  onComment: () {
+                    Navigator.pushNamed(context, '/comment',
+                        arguments: post["id"]);
+                  },
                 );
               },
             ),
