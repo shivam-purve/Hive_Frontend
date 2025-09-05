@@ -48,10 +48,8 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         backgroundColor: Colors.white,
-        drawer: Drawer(
-          backgroundColor: Colors.white,
-        ),
         body: PageView(
           controller: _pageController,
           physics: NeverScrollableScrollPhysics(),
@@ -59,20 +57,15 @@ class _Home extends State<Home> {
         ),
         appBar: AppBar(
           scrolledUnderElevation: 0,
-            leading: Builder(
-              builder: (context) => Padding(
-                padding: const EdgeInsets.only(left : 13.0),
-                child: IconButton(
-                  icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
+          automaticallyImplyLeading: false,
+            title: Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Text("Hive",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700
                 ),
-              ),
-            ),
-            title: Text("Hive",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700
               ),
             ),
             backgroundColor: Colors.white,

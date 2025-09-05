@@ -30,25 +30,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../main.dart';
 import '../widgets/post_card.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Instagram User Page",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const UserProfilePage(),
-    );
-  }
-}
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -95,11 +76,9 @@ class _UserProfilePageState extends State<UserProfilePage> with AutomaticKeepAli
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage(
-                      "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    ),
+                    backgroundImage: NetworkImage(googleUser?.photoUrl ?? ""),
                   ),
                   const SizedBox(width: 20),
                   Expanded(

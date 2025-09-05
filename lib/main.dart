@@ -44,8 +44,10 @@ final GoogleSignIn googleSignIn = GoogleSignIn(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://jkchajftfotdjrnfeuwv.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprY2hhamZ0Zm90ZGpybmZldXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5OTQzOTksImV4cCI6MjA3MjU3MDM5OX0.5CDJ6bq_VIM-a2pD7W3Asvpiu_vLvqG7F3vM6oyewpQ',
+      url: 'https://urgjympujyzkghpshrct.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2p5bXB1anl6a2docHNocmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTgyNTQsImV4cCI6MjA3MTc3NDI1NH0.NbuZIxH9-jTBoL9OCML0bxUlplY7pzGXA25orw9nhIo',
+    // url: 'https://jkchajftfotdjrnfeuwv.supabase.co',
+    // anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprY2hhamZ0Zm90ZGpybmZldXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5OTQzOTksImV4cCI6MjA3MjU3MDM5OX0.5CDJ6bq_VIM-a2pD7W3Asvpiu_vLvqG7F3vM6oyewpQ',
   );
 
 
@@ -55,6 +57,7 @@ Future<void> main() async {
 }
 
 final supabase = Supabase.instance.client;
+GoogleSignInAccount? googleUser;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -251,7 +254,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
 
 
-                // ✅ Google Sign-In Button replaces email & password
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
