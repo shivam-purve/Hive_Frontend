@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../colors_theme/color.dart';
 import '../widgets/notification_widget.dart';
-import '../services/notification_service.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -10,97 +10,89 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage>
-    with AutomaticKeepAliveClientMixin<NotificationsPage> {
+class _NotificationsPageState extends State<NotificationsPage> with AutomaticKeepAliveClientMixin<NotificationsPage>{
   @override
   bool get wantKeepAlive => true;
 
-  final NotificationService _notificationService = NotificationService();
-  List<AppNotification> _notifications = [];
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNotifications();
-  }
-
-  Future<void> _loadNotifications() async {
-    try {
-      final res = await _notificationService.fetchNotifications();
-      final notifications = res
-          .map<AppNotification>((n) => AppNotification.fromJson(n))
-          .toList();
-
-      if (!mounted) return;
-      setState(() {
-        _notifications = notifications;
-        _loading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load notifications: $e")),
-      );
-    }
-  }
-
-  Future<void> _deleteNotification(int index) async {
-    final notification = _notifications[index];
-
-    setState(() {
-      _notifications.removeAt(index);
-    });
-
-    try {
-      await _notificationService.deleteNotification(notification.id);
-    } catch (e) {
-      // rollback on error
-      setState(() {
-        _notifications.insert(index, notification);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to delete notification: $e")),
-      );
-    }
-  }
+  final List<AppNotification> _notifications = [
+    AppNotification(
+      title: "New Message",
+      message: "You got a new message from John",
+      time: "10:30 AM", id: '',
+    ),
+    AppNotification(
+      title: "Reminder",
+      message: "Don’t forget your meeting at 3 PM",
+      time: "9:00 AM", id: '',
+    ),
+    AppNotification(
+      title: "Update",
+      message: "Your app has been updated successfully",
+      time: "Yesterday", id: '',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text("Recent Notifications"),
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-        onRefresh: _loadNotifications,
-        child: _notifications.isEmpty
-            ? const Center(child: Text("No notifications found"))
-            : ListView.builder(
-          itemCount: _notifications.length,
-          itemBuilder: (context, index) {
-            final notification = _notifications[index];
-            return Dismissible(
-              key: Key(notification.id),
-              direction: DismissDirection.startToEnd,
-              background: Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                color: Colors.red,
-                child: const Icon(Icons.delete, color: Colors.white),
+      body: ListView.builder(
+        itemCount: _notifications.length,
+        itemBuilder: (context, index) {
+          final notification = _notifications[index];
+          return Dismissible(
+            key: Key(notification.title + index.toString()), // unique key
+            direction: DismissDirection.startToEnd, // swipe left
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              color: Colors.red,
+              child: const Icon(
+                Icons.delete,
+                color: Colors.white,
               ),
-              onDismissed: (_) => _deleteNotification(index),
-              child: NotificationItem(notification: notification),
-            );
-          },
-        ),
+            ),
+            onDismissed: (direction) {
+              setState(() {
+                _notifications.removeAt(index);
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("${notification.title} removed"),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            child: Card(
+              elevation: 2,
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                tileColor: AppColors.primary_light,
+                title: Text(
+                  notification.title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                subtitle: Text(notification.message),
+                trailing: Text(
+                  notification.time,
+                  style: const TextStyle(color: Colors.blueGrey, fontSize: 12),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
+
 }
