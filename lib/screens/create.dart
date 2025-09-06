@@ -31,6 +31,44 @@ class _CreateState extends State<Create>
     super.dispose();
   }
 
+
+  Future<Map<String, dynamic>?> _submitPost(String content) async {
+    try {
+      final session = supabase.auth.currentSession;
+      final jwt = session?.accessToken;
+      final user = supabase.auth.currentUser;
+      final userId = user?.id;
+
+      if (jwt == null || userId == null) {
+        throw Exception("No active Supabase session. Please log in again.");
+      }
+
+      final url = Uri.parse("$kBaseUrl/post/");
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $jwt",
+        },
+        body: jsonEncode({
+          "content": content,
+          "owner_id": userId, // ✅ required by your backend
+        }),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+          "Failed to create post: ${response.body} + ${response.statusCode}",
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ Error creating post: $e");
+      rethrow;
+    }
+  }
+
   Future<void> _onSendPressed() async {
     final enteredText = _textController.text.trim();
     if (enteredText.isEmpty) return;
@@ -38,45 +76,20 @@ class _CreateState extends State<Create>
     setState(() => _isSubmitting = true);
 
     try {
-      // 🔹 Call backend API to create post
-      // final newPost = await PostService().createPost(enteredText);
+      final newPost = await _submitPost(enteredText);
 
-      // 🔹 Show local notification for UX feedback
-      final prefs = await SharedPreferences.getInstance();
-      final String? accessToken = prefs.getString('accessToken');
-      final url = Uri.parse("$kBaseUrl/post/");
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $accessToken", // auth header
-        },
-        body: jsonEncode({"content": enteredText}),
-      );
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(
-          "Failed to create post: ${response.body} + ${response.statusCode} + $accessToken",
-        );
-      }
-      // NotiService().showNotification(
-      //   title: "Post Queued Successfully!",
-      //   body: "Your post is being analyzed by our system.",
-      // );
-      //
-      // if (!mounted) return;
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
-      // );
+      if (!mounted) return;
 
       _textController.clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("✅ Post created: ${newPost?['content']}")),
+      );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("❌ Failed to create post: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ Failed to create post: $e")),
+      );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }

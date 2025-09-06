@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +9,8 @@ import 'package:hive/screens/home_screen.dart';
 import 'package:hive/screens/search.dart';
 import 'package:hive/screens/notifs.dart';
 import 'package:hive/screens/user.dart';
+import 'package:hive/services/user_service.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'main.dart';
@@ -55,12 +59,45 @@ class _Home extends State<Home> {
       child: ListView(
         children: [
           TextButton(onPressed: () async {
-            await supabase.auth.signInWithOAuth(
-              OAuthProvider.google,
-              redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
-              authScreenLaunchMode:
-              kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
-            );
+            try {
+              // 1. Get Supabase JWT
+              final session = supabase.auth.currentSession;
+              final jwt = session?.accessToken;
+
+              if (jwt == null) {
+                throw Exception("No Supabase session found. User not logged in.");
+              }
+
+              // 2. Call your backend logout endpoint
+              final response = await http.get(
+                Uri.parse("https://your-backend.com/user/logout"),
+                headers: {
+                  "Authorization": "Bearer $jwt",
+                  "Content-Type": "application/json",
+                },
+              );
+
+              // 3. Handle response
+              if (response.statusCode == 200) {
+                final data = jsonDecode(response.body);
+                print("✅ ${data['message']}");
+
+                await supabase.auth.signInWithOAuth(
+                  OAuthProvider.google,
+                  redirectTo: kIsWeb ? null : 'com.hive://login-callback', // Optionally set the redirect link to bring back the user via deeplink.
+                  authScreenLaunchMode:
+                  kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+                );
+              } else {
+                throw Exception(
+                  "❌ Logout failed: ${response.statusCode} ${response.body}",
+                );
+              }
+            } catch (e) {
+              print("⚠️ Error during logout: $e");
+              rethrow;
+            }
+
           }, child: Text("Sign OUT"))
         ],
       ),),

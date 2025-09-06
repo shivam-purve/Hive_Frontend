@@ -30,16 +30,18 @@ class _HomeScreenState extends State<HomeScreen>
       setState(() {
         _posts = posts.map((p) => {
           "id": p["pid"], // post ID
-          "profileName": p["owner"]?["full_name"] ?? "Unknown",
-          "username": p["owner"]?["username"] ?? "",
-          "profilePic": p["owner"]?["profile_pic_url"],
-          "verified": p["verification_status"] ?? false,
+          "profileName": p["authorDisplayName"] ?? p["authorName"] ?? "Unknown",
+          "username": p["authorName"] ?? "",
+          "profilePic": p["authorAvatar"],
+          "verified": p["verified"] ?? false,
           "description": p["content"] ?? "",
           "likes": p["likes"] ?? 0,
           "dislikes": p["dislikes"] ?? 0,
           "isLiked": false,
           "isDisliked": false,
+          "imageIcon": Icons.article, // ✅ ensure it's never null
         }).toList();
+
         _loading = false;
       });
     } catch (e) {
