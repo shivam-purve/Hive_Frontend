@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +7,9 @@ import 'package:hive/screens/home_screen.dart';
 import 'package:hive/screens/search.dart';
 import 'package:hive/screens/notifs.dart';
 import 'package:hive/screens/user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'main.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -47,7 +51,19 @@ class _Home extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: Drawer(backgroundColor: Colors.white),
+      drawer: Drawer(backgroundColor: Colors.white,
+      child: ListView(
+        children: [
+          TextButton(onPressed: () async {
+            await supabase.auth.signInWithOAuth(
+              OAuthProvider.google,
+              redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+              authScreenLaunchMode:
+              kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+            );
+          }, child: Text("Sign OUT"))
+        ],
+      ),),
       body: PageView(
         controller: _pageController,
         physics: NeverScrollableScrollPhysics(),
