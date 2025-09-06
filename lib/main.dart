@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:social_garbage/screens/comment.dart';
+// import 'package:hive/screens/comment.dart';
 //
 // import 'home.dart';
 // import 'notifs/noti_service.dart';
@@ -27,32 +27,32 @@
 //   }
 // }
 
-
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:social_garbage/screens/comment.dart';
-import 'package:social_garbage/services/api_client.dart';
+import 'package:hive/screens/comment.dart';
+import 'package:hive/services/api_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+// import 'package:uni_links/uni_links.dart';
 import 'home.dart';
 import 'notifs/noti_service.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn(
-  serverClientId: '1054235009294-au7ct1olifehpfabqmo068d2pshrba8p.apps.googleusercontent.com',
+  serverClientId:
+      '1054235009294-au7ct1olifehpfabqmo068d2pshrba8p.apps.googleusercontent.com',
 );
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-      url: 'https://urgjympujyzkghpshrct.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2p5bXB1anl6a2docHNocmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTgyNTQsImV4cCI6MjA3MTc3NDI1NH0.NbuZIxH9-jTBoL9OCML0bxUlplY7pzGXA25orw9nhIo',
+    url: 'https://urgjympujyzkghpshrct.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2p5bXB1anl6a2docHNocmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTgyNTQsImV4cCI6MjA3MTc3NDI1NH0.NbuZIxH9-jTBoL9OCML0bxUlplY7pzGXA25orw9nhIo',
     // url: 'https://jkchajftfotdjrnfeuwv.supabase.co',
     // anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprY2hhamZ0Zm90ZGpybmZldXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5OTQzOTksImV4cCI6MjA3MjU3MDM5OX0.5CDJ6bq_VIM-a2pD7W3Asvpiu_vLvqG7F3vM6oyewpQ',
   );
-
 
   //Init notifications
   NotiService().initNotification();
@@ -61,6 +61,7 @@ Future<void> main() async {
 
 final supabase = Supabase.instance.client;
 GoogleSignInAccount? googleUser;
+GoogleSignInAuthentication? googleAuth;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -68,15 +69,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        routes: {
-          '/comment': (context) => const Comment(),
-        },
-        home: LoginScreen()
+      debugShowCheckedModeBanner: false,
+      routes: {'/comment': (context) => const Comment()},
+      home: LoginScreen(),
     );
   }
 }
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,34 +84,103 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String? _userId;
+  // StreamSubscription? _sub;
   final _formKey = GlobalKey<FormState>();
   String email = "", password = "";
 
   void _setupAuthListener() {
-    supabase.auth.onAuthStateChange.listen((data) {
+    supabase.auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       if (event == AuthChangeEvent.signedIn) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const Home(),
-          ),
-        );
+        try {
+          // Hide any loading dialog
+          if (context.mounted && Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+
+          // Get the Supabase access token
+          final session = supabase.auth.currentSession;
+          final supabaseToken = session?.accessToken;
+
+          if (supabaseToken != null) {
+            // Call backend to set up user defaults
+            final response = await http.post(
+              Uri.parse("$kBaseUrl/user/defaults"),
+              headers: {
+                "Authorization": "Bearer $supabaseToken",
+                "Content-Type": "application/json",
+              },
+            );
+
+            if (response.statusCode == 200) {
+              // Successfully set up user, navigate to home
+              if (context.mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const Home()),
+                );
+              }
+            } else {
+              // Backend call failed but user is authenticated
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("⚠️ User setup failed: ${response.body}"),
+                  ),
+                );
+                // Still navigate to home as user is authenticated
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const Home()),
+                );
+              }
+            }
+          } else {
+            // No token available
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("❌ Authentication failed: No token"),
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          // Handle any errors during backend call
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("❌ Error: $e")));
+            // Still navigate to home as user is authenticated
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const Home()),
+            );
+          }
+        }
       }
     });
   }
+
   @override
   void initState() {
     _setupAuthListener();
     super.initState();
-
+    // _sub = uriLinkStream.listen((Uri? uri) {
+    //   if (uri != null && uri.scheme == 'myapp' && uri.host == 'login-callback') {
+    //     final accessToken = uri.queryParameters['access_token'];
+    //     final idToken = uri.queryParameters['id_token'];
+    //     // Use these tokens to log in your app / backend
+    //   }
+    // });
     // supabase.auth.onAuthStateChange.listen((data) {
     //   setState(() {
     //     _userId = data.session?.user.id;
     //   });
     // });
+  }
 
-
+  @override
+  void dispose() {
+    // _sub?.cancel();
+    super.dispose();
   }
 
   // @override
@@ -248,14 +315,16 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Image(image: AssetImage("assets/icons/hive_logo.png"), height: 200,),
+                const Image(
+                  image: AssetImage("assets/icons/hive_logo.png"),
+                  height: 200,
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   "Login",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 30),
-
 
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -266,10 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     minimumSize: const Size.fromHeight(50),
                   ),
-                  icon: Image.asset(
-                    "assets/icons/google.png",
-                    height: 24,
-                  ),
+                  icon: Image.asset("assets/icons/google.png", height: 24),
                   label: const Text(
                     "Sign in with Google",
                     style: TextStyle(
@@ -278,49 +344,34 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    final navigator = Navigator.of(context);
-
-                    unawaited(showDialog(context: context,
+                    try {
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
                         barrierDismissible: false,
-                        builder: (_) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                    ));
-                    final googleUser = await googleSignIn.signIn();
-                    final googleAuth = await googleUser!.authentication;
-                    final accessToken = googleAuth.accessToken;
-                    final idToken = googleAuth.idToken;
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
 
-                    if (accessToken == null) {
-                      throw 'No Access Token found.';
-                    }
-                    if (idToken == null) {
-                      throw 'No ID Token found.';
-                    }
-                    navigator.pop();
-                    await supabase.auth.signInWithIdToken(
-                      provider: OAuthProvider.google,
-                      idToken: idToken,
-                      accessToken: accessToken,
-                    );
+                      // Start OAuth flow - this will open browser/WebView
+                      await supabase.auth.signInWithOAuth(
+                        OAuthProvider.google,
+                        redirectTo: "com.hive://login-callback",
+                      );
 
-                    final url = Uri.parse("$kBaseUrl/defaults");
-                    final response = await http.post(
-                      url,
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer ${googleAuth.accessToken}", // send in header
-                      },
-                    );
-
-                    if (response.statusCode == 200) {
-                      final data = jsonDecode(response.body);
-                      return data; // could be { access_token, user, ... }
-                    } else {
-                      throw Exception("Login failed: ${response.body}");
+                      // The auth listener will handle the redirect and navigation
+                      // No need to manually check session here as OAuth is asynchronous
+                    } catch (e) {
+                      // Hide loading indicator
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("❌ Login failed: $e")),
+                        );
+                      }
                     }
-                  }
-                )
+                  },
+                ),
               ],
             ),
           ),
@@ -368,6 +419,3 @@ class UserService {
     return response;
   }
 }
-
-
-

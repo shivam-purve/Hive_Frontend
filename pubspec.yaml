@@ -1,8 +1,8 @@
-name: social_garbage
+name: hive
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.9.0 <4.0.0"
+    sdk: ">=3.9.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -28,78 +28,79 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
+    flutter:
+        sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  flutter_svg: ^2.2.0
-  flutter_local_notifications: ^19.4.1
-  go_router: ^16.2.1
-  google_sign_in: ^6.1.0
-  supabase_flutter: ^2.10.0
-  image_picker: ^1.2.0
-  http: ^1.5.0
-
+    # The following adds the Cupertino Icons font to your application.
+    # Use with the CupertinoIcons class for iOS style icons.
+    cupertino_icons: ^1.0.8
+    flutter_svg: ^2.2.0
+    flutter_local_notifications: ^19.4.1
+    go_router: ^16.2.1
+    google_sign_in: ^6.1.0
+    supabase_flutter: ^2.10.0
+    image_picker: ^1.2.0
+    http: ^1.5.0
+    shared_preferences: ^2.5.3
+#  uni_links: ^0.5.1
 
 dev_dependencies:
-  google_fonts: ^6.3.0
-  flutter_test:
-    sdk: flutter
+    google_fonts: ^6.3.0
+    flutter_test:
+        sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.14.4
+    # The "flutter_lints" package below contains a set of recommended lints to
+    # encourage good coding practices. The lint set provided by the package is
+    # activated in the `analysis_options.yaml` file located at the root of your
+    # package. See that file for information about deactivating specific lint
+    # rules and activating additional ones.
+    flutter_lints: ^6.0.0
+    flutter_launcher_icons: ^0.14.4
 
 flutter:
-  uses-material-design: true
-  assets:
-    - assets/icons/
+    uses-material-design: true
+    assets:
+        - assets/icons/
 
-  # https://flutter.dev/to/resolution-aware-images
+    # https://flutter.dev/to/resolution-aware-images
 
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
+    # For details regarding adding assets from package dependencies, see
+    # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+    # To add custom fonts to your application, add a fonts section here,
+    # in this "flutter" section. Each entry in this list should have a
+    # "family" key with the font family name, and a "fonts" key with a
+    # list giving the asset and other descriptors for the font. For
+    # example:
+    # fonts:
+    #   - family: Schyler
+    #     fonts:
+    #       - asset: fonts/Schyler-Regular.ttf
+    #       - asset: fonts/Schyler-Italic.ttf
+    #         style: italic
+    #   - family: Trajan Pro
+    #     fonts:
+    #       - asset: fonts/TrajanPro.ttf
+    #       - asset: fonts/TrajanPro_Bold.ttf
+    #         weight: 700
+    #
+    # For details regarding fonts from package dependencies,
+    # see https://flutter.dev/to/font-from-package
 
 flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icons/hive_logo.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  web:
-    generate: true
+    android: "launcher_icon"
+    ios: true
     image_path: "assets/icons/hive_logo.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: true
-    image_path: "assets/icons/hive_logo.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: true
-    image_path: "assets/icons/hive_logo.png"
+    min_sdk_android: 21 # android min sdk min:16, default 21
+    web:
+        generate: true
+        image_path: "assets/icons/hive_logo.png"
+        background_color: "#hexcode"
+        theme_color: "#hexcode"
+    windows:
+        generate: true
+        image_path: "assets/icons/hive_logo.png"
+        icon_size: 48 # min:48, max:256, default: 48
+    macos:
+        generate: true
+        image_path: "assets/icons/hive_logo.png"

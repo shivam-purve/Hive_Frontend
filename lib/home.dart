@@ -1,15 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:google_fonts/google_fonts.dart';
-import 'package:social_garbage/screens/create.dart';
-import 'package:social_garbage/screens/home_screen.dart';
-import 'package:social_garbage/screens/search.dart';
-import 'package:social_garbage/screens/notifs.dart';
-import 'package:social_garbage/screens/user.dart';
+import 'package:hive/screens/create.dart';
+import 'package:hive/screens/home_screen.dart';
+import 'package:hive/screens/search.dart';
+import 'package:hive/screens/notifs.dart';
+import 'package:hive/screens/user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'main.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
-
 
   @override
   State<Home> createState() => _Home();
@@ -34,7 +37,7 @@ class _Home extends State<Home> {
     const SearchScreen(),
     const Create(),
     NotificationsPage(),
-    const UserProfilePage()
+    const UserProfilePage(),
   ];
 
   @override
@@ -47,77 +50,86 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      drawer: Drawer(backgroundColor: Colors.white,
+      child: ListView(
+        children: [
+          TextButton(onPressed: () async {
+            await supabase.auth.signInWithOAuth(
+              OAuthProvider.google,
+              redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+              authScreenLaunchMode:
+              kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+            );
+          }, child: Text("Sign OUT"))
+        ],
+      ),),
+      body: PageView(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        children: screenList,
+      ),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        leading: Builder(
+          builder: (context) => Padding(
+            padding: const EdgeInsets.only(left: 13.0),
+            child: IconButton(
+              icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+        ),
+        title: Text(
+          "Hive",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         backgroundColor: Colors.white,
-        drawer: Drawer(
-          backgroundColor: Colors.white,
-        ),
-        body: PageView(
-          controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: screenList,
-        ),
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          leading: Builder(
-            builder: (context) => Padding(
-              padding: const EdgeInsets.only(left : 13.0),
-              child: IconButton(
-                icon: const ImageIcon(AssetImage('assets/icons/menu_bar.png')),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 94,
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (selectedIndex) {
+            setState(() {
+              _selectedIndex = selectedIndex;
+              _pageController.jumpToPage(selectedIndex);
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          iconSize: 23,
+          backgroundColor: Color.fromARGB(255, 254, 198, 41),
+          selectedLabelStyle: TextStyle(),
+          unselectedItemColor: Colors.black,
+          selectedItemColor: Colors.black,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home),
+              label: "Home",
             ),
-          ),
-          title: Text("Hive",
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 25,
-                fontWeight: FontWeight.w700
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/compass.png')),
+              label: "Navigate",
             ),
-          ),
-          backgroundColor: Colors.white,
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/plus.png')),
+              label: "Create",
+            ),
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/bell.png')),
+              label: "Notifs",
+            ),
+            BottomNavigationBarItem(
+              icon: const ImageIcon(AssetImage('assets/icons/user.png')),
+              label: "User",
+            ),
+          ],
         ),
-        bottomNavigationBar: SizedBox(
-          height: 94,
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (selectedIndex) {
-              setState(() {
-                _selectedIndex = selectedIndex;
-                _pageController.jumpToPage(selectedIndex);
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            iconSize: 23,
-            backgroundColor: Color.fromARGB(255, 254, 198, 41),
-            selectedLabelStyle: TextStyle(),
-            unselectedItemColor: Colors.black,
-            selectedItemColor: Colors.black,
-            items: [
-              BottomNavigationBarItem(
-                  icon: const Icon(Icons.home),
-                  label: "Home"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/compass.png')),
-                  label: "Navigate"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/plus.png')),
-                  label: "Create"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/bell.png')),
-                  label: "Notifs"
-              ),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(AssetImage('assets/icons/user.png')),
-                  label: "User"
-              ),
-
-            ],
-          ),
-        )
+      ),
     );
   }
-
 }

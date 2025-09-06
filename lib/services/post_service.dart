@@ -50,8 +50,7 @@
 //   }
 // }
 
-
-import 'package:social_garbage/main.dart';
+import 'package:hive/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PostService {
@@ -60,7 +59,9 @@ class PostService {
   Future<List<Map<String, dynamic>>> fetchPosts() async {
     final res = await _client
         .from('posts')
-        .select('pid, content, media_url, verification_status, created_at, likes, dislikes, owner:users(uid, full_name, username, profile_pic_url)')
+        .select(
+          'pid, content, media_url, verification_status, created_at, likes, dislikes, owner:users(uid, full_name, username, profile_pic_url)',
+        )
         .order('created_at', ascending: false);
 
     return List<Map<String, dynamic>>.from(res);
@@ -69,14 +70,21 @@ class PostService {
   Future<void> likePost(String postId) async {
     await _client
         .from('posts')
-        .update({'likes': _client.rpc('increment_likes', params: {'post_id': postId})})
+        .update({
+          'likes': _client.rpc('increment_likes', params: {'post_id': postId}),
+        })
         .eq('pid', postId);
   }
 
   Future<void> dislikePost(String postId) async {
     await _client
         .from('posts')
-        .update({'dislikes': _client.rpc('increment_dislikes', params: {'post_id': postId})})
+        .update({
+          'dislikes': _client.rpc(
+            'increment_dislikes',
+            params: {'post_id': postId},
+          ),
+        })
         .eq('pid', postId);
   }
 }

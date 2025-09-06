@@ -1,7 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:social_garbage/notifs/noti_service.dart';
-import 'package:social_garbage/services/post_service.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/notifs/noti_service.dart';
+import 'package:hive/services/post_service.dart';
+
+import '../main.dart';
+import '../services/api_client.dart';
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -35,22 +42,41 @@ class _CreateState extends State<Create>
       // final newPost = await PostService().createPost(enteredText);
 
       // 🔹 Show local notification for UX feedback
-      NotiService().showNotification(
-        title: "Post Queued Successfully!",
-        body: "Your post is being analyzed by our system.",
+      final prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString('accessToken');
+      final url = Uri.parse("$kBaseUrl/post/");
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken", // auth header
+        },
+        body: jsonEncode({"content": enteredText}),
       );
 
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+          "Failed to create post: ${response.body} + ${response.statusCode} + $accessToken",
+        );
+      }
+      // NotiService().showNotification(
+      //   title: "Post Queued Successfully!",
+      //   body: "Your post is being analyzed by our system.",
+      // );
+      //
       // if (!mounted) return;
       // ScaffoldMessenger.of(context).showSnackBar(
-        // SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
+      //   SnackBar(content: Text("✅ Post created: ${newPost['content']}")),
       // );
 
       _textController.clear();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Failed to create post: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("❌ Failed to create post: $e")));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -74,10 +100,14 @@ class _CreateState extends State<Create>
                   color: const Color.fromARGB(43, 254, 198, 41),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                margin:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -103,14 +133,23 @@ class _CreateState extends State<Create>
                       ],
                     ),
                     const SizedBox(height: 20),
-                    _buildStatRow("Safe Content", "75%",
-                        const Color.fromARGB(255, 0, 171, 74)),
+                    _buildStatRow(
+                      "Safe Content",
+                      "75%",
+                      const Color.fromARGB(255, 0, 171, 74),
+                    ),
                     const SizedBox(height: 12.5),
-                    _buildStatRow("Under Review", "15%",
-                        const Color.fromARGB(255, 181, 144, 30)),
+                    _buildStatRow(
+                      "Under Review",
+                      "15%",
+                      const Color.fromARGB(255, 181, 144, 30),
+                    ),
                     const SizedBox(height: 12.5),
-                    _buildStatRow("Flagged Content", "10%",
-                        const Color.fromARGB(255, 224, 62, 99)),
+                    _buildStatRow(
+                      "Flagged Content",
+                      "10%",
+                      const Color.fromARGB(255, 224, 62, 99),
+                    ),
                     const SizedBox(height: 10),
                     const Text(
                       "Real-Time Update from Post Content",
@@ -136,8 +175,10 @@ class _CreateState extends State<Create>
                   color: const Color.fromARGB(43, 254, 198, 41),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                margin:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,18 +208,18 @@ class _CreateState extends State<Create>
                       constraints: const BoxConstraints(),
                       icon: _isSubmitting
                           ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Color.fromARGB(255, 254, 198, 41),
-                        ),
-                      )
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color.fromARGB(255, 254, 198, 41),
+                              ),
+                            )
                           : const ImageIcon(
-                        AssetImage("assets/icons/send.png"),
-                        size: 28,
-                        color: Color.fromARGB(255, 254, 198, 41),
-                      ),
+                              AssetImage("assets/icons/send.png"),
+                              size: 28,
+                              color: Color.fromARGB(255, 254, 198, 41),
+                            ),
                       onPressed: _isSubmitting ? null : _onSendPressed,
                     ),
                   ],
@@ -192,8 +233,10 @@ class _CreateState extends State<Create>
 
               // Info Section
               Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 child: Column(
                   children: const [
                     Text(
