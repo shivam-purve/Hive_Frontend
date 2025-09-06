@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen>
           "username": p["authorName"] ?? "",
           "profilePic": p["authorAvatar"],
           "verified": p["verified"] ?? false,
+          "verificationStatus": p["verificationStatus"] ?? "pending",
           "description": p["content"] ?? "",
           "likes": p["likes"] ?? 0,
           "dislikes": p["dislikes"] ?? 0,
@@ -144,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen>
             final isUpdating = _updatingIndexes.contains(index);
 
             return PostCard(
+              verificationStatus: post["verificationStatus"],
               profileName: post["profileName"],
               verified: post["verified"],
               description: post["description"],

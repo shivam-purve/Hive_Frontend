@@ -170,6 +170,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                 itemBuilder: (context, index) {
                   final post = _posts[index];
                   return PostCard(
+                    verificationStatus: post["verificationStatus"],
                     profileName: post["profileName"],
                     verified: post["verified"],
                     description: post["description"],

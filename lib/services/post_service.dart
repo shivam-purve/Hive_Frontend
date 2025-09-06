@@ -53,6 +53,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive/main.dart';
 import 'package:hive/services/api_client.dart';
 import 'package:http/http.dart' as http;
@@ -102,11 +103,15 @@ class PostService {
     );
 
     if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("Response body: ${response.body}");
+      }
       final List<dynamic> data = json.decode(response.body);
 
       return data.map<Map<String, dynamic>>((post) {
         return {
           "pid": post["pid"] ?? "",
+          "verificationStatus": post["verification_status"] ?? "pending",
           "content": post["content"] ?? "",
           "authorName": post["author_name"] ?? "",
           "authorDisplayName": post["author_display_name"] ?? "",

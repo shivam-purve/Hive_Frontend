@@ -243,11 +243,11 @@ class PostCard extends StatelessWidget {
   final String profileName;
   final bool verified;
   final String description;
+  final String verificationStatus; // NEW param
   final IconData imageIcon;
-
   final bool isLiked;
   final bool isDisliked;
-  final bool isUpdating; // NEW param
+  final bool isUpdating;
 
   final VoidCallback? onLike;
   final VoidCallback? onDislike;
@@ -258,14 +258,53 @@ class PostCard extends StatelessWidget {
     required this.profileName,
     required this.verified,
     required this.description,
+    required this.verificationStatus,  // NEW param
     required this.imageIcon,
     required this.isLiked,
     required this.isDisliked,
     required this.onLike,
     required this.onDislike,
     required this.onComment,
-    this.isUpdating = false,  // Default to false
+    this.isUpdating = false,
   });
+
+  Color _getVerificationColor(String status) {
+    switch (status.toLowerCase()) {
+      case "verified":
+        return Colors.green;
+      case "unverified":
+        return Colors.orange;
+      case "personal_opinion":
+        return Colors.blue;
+      case "misinformation":
+        return Colors.red;
+      case "factual_error":
+        return Colors.purple;
+      case "other":
+        return Colors.grey;
+      default:
+        return Colors.black54;
+    }
+  }
+
+  String verificationStatusDisplay(String status) {
+    switch (status.toLowerCase()) {
+      case "verified":
+        return "Verified & Safe";
+      case "unverified":
+        return "Unverified Info";
+      case "personal_opinion":
+        return "Personal Opinion";
+      case "misinformation":
+        return "Misinformation";
+      case "factual_error":
+        return "Factual Error";
+      case "other":
+        return "Other";
+      default:
+        return "Unknown Status";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -309,10 +348,10 @@ class PostCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            verified ? "Verified & Safe" : "Unverified Info",
+                            verificationStatusDisplay(verificationStatus),
                             style: TextStyle(
                               fontSize: 12,
-                              color: verified ? Colors.green : Colors.orange,
+                              color: _getVerificationColor(verificationStatus),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -332,6 +371,9 @@ class PostCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 14),
               ),
             ),
+
+            const SizedBox(height: 8),
+
 
             const SizedBox(height: 10),
 
@@ -405,3 +447,4 @@ class PostCard extends StatelessWidget {
     );
   }
 }
+
