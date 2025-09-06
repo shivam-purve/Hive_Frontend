@@ -35,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen>
         query: _searchController.text,
         status: _filter,
       );
-      setState(() => _posts = results);
+      setState(() => _posts = results); // results is List<Map<String, dynamic>>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -45,6 +45,7 @@ class _SearchScreenState extends State<SearchScreen>
       if (mounted) setState(() => _loading = false);
     }
   }
+
 
   void _setFilter(String filter) {
     setState(() => _filter = filter);
@@ -127,60 +128,62 @@ class _SearchScreenState extends State<SearchScreen>
                   ? const Center(
                 child: Text(
                   "No results found 🔍",
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               )
                   : ListView.builder(
                 itemCount: _posts.length,
                 itemBuilder: (context, index) {
-                  final post = _posts[index];
+                  final user = _posts[index];
                   return Card(
-                    shadowColor: Colors.transparent,
                     color: AppColors.primary_light,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    elevation: 2,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:
-                        _statusColor(post["moderation_status"] ??
-                            post["status"] ??
-                            "Safe"),
-                        child: Text(
-                          (post["author"]?["name"] ??
-                              post["username"] ??
-                              "?")[0]
-                              .toUpperCase(),
-                          style:
-                          const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      title: Text(
-                        post["author"]?["name"] ??
-                            post["username"] ??
-                            "Unknown",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 3),
+                    elevation: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0), // bigger padding for larger card
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start, // align text at top
                         children: [
-                          Text(post["content"] ?? ""),
-                          const SizedBox(height: 4),
-                          Text(
-                            post["moderation_status"] ??
-                                post["status"] ??
-                                "Safe",
-                            style: TextStyle(
-                              color: _statusColor(
-                                  post["moderation_status"] ??
-                                      post["status"] ??
-                                      "Safe"),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                          // Name column
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              user["full_name"] ?? "Unknown",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              softWrap: true,
+                            ),
+                          ),
+
+                          // Email column
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              user["email"] ?? "",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                              softWrap: true,
+                            ),
+                          ),
+
+                          // Bio column
+                          Expanded(
+                            flex: 4,
+                            child: Text(
+                              user["bio"] ?? "",
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black54,
+                              ),
+                              softWrap: true,
                             ),
                           ),
                         ],
@@ -189,7 +192,7 @@ class _SearchScreenState extends State<SearchScreen>
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),

@@ -28,8 +28,9 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   Future<void> _loadUserData() async {
     try {
+
       final user = await _userService.getCurrentUser();
-      final posts = await _userService.getUserPosts(user['id'].toString());
+      final posts = await _userService.getUserPosts(user['uid'].toString());
       if (!mounted) return;
       setState(() {
         _user = user;
@@ -37,7 +38,7 @@ class _UserProfilePageState extends State<UserProfilePage>
             .map<Map<String, dynamic>>((p) => {
           "id": p["id"],
           "profileName": user["name"] ?? "User",
-          "verified": p["verified"] ?? false,
+          "verified": p["verified"],
           "description": p["content"] ?? "",
           "imageIcon": Icons.article,
           "isLiked": false,
@@ -50,7 +51,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load user data: $e")),
+        SnackBar(content: Text(" $_posts + Failed to load user data: $e")),
       );
     }
   }
@@ -105,85 +106,90 @@ class _UserProfilePageState extends State<UserProfilePage>
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Profile Header
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: _user?['avatar'] != null
-                        ? NetworkImage(_user!['avatar'])
-                        : const AssetImage("assets/icons/user.png")
-                    as ImageProvider,
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _StatColumn(
-                          label: "Posts",
-                          count: _posts.length.toString(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Bio Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: RefreshIndicator(
+        onRefresh: _loadUserData, // 👈 swipe down will call this
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), // 👈 important for RefreshIndicator
+          child: Column(
+            children: [
+              // Profile Header
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
                   children: [
-                    Text(_user?['name'] ?? "Unknown",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 4),
-                    Text(_user?['bio'] ?? "This user has no bio."),
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: _user?['avatar'] != null
+                          ? NetworkImage(_user!['avatar'])
+                          : const AssetImage("assets/icons/user.png")
+                      as ImageProvider,
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _StatColumn(
+                            label: "Posts",
+                            count: _posts.length.toString(),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
 
-            // User Posts
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _posts.length,
-              itemBuilder: (context, index) {
-                final post = _posts[index];
-                return PostCard(
-                  profileName: post["profileName"],
-                  verified: post["verified"],
-                  description: post["description"],
-                  imageIcon: post["imageIcon"],
-                  isLiked: post["isLiked"],
-                  isDisliked: post["isDisliked"],
-                  onLike: () => _toggleLike(index),
-                  onDislike: () => _toggleDislike(index),
-                  onComment: () {
-                    Navigator.pushNamed(context, '/comment',
-                        arguments: post["id"]);
-                  },
-                );
-              },
-            ),
-          ],
+              // Bio Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_user?['name'] ?? "Unknown",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      Text(_user?['bio'] ?? "This user has no bio."),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // User Posts
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _posts.length,
+                itemBuilder: (context, index) {
+                  final post = _posts[index];
+                  return PostCard(
+                    profileName: post["profileName"],
+                    verified: post["verified"],
+                    description: post["description"],
+                    imageIcon: post["imageIcon"],
+                    isLiked: post["isLiked"],
+                    isDisliked: post["isDisliked"],
+                    onLike: () => _toggleLike(index),
+                    onDislike: () => _toggleDislike(index),
+                    onComment: () {
+                      Navigator.pushNamed(context, '/comment',
+                          arguments: post["id"]);
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }
 
 class _StatColumn extends StatelessWidget {

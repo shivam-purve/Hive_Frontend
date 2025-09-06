@@ -50,41 +50,124 @@
 //   }
 // }
 
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:hive/main.dart';
+import 'package:hive/services/api_client.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hive/services/post_service.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../main.dart';
 
 class PostService {
-  final SupabaseClient _client = supabase;
+  /// Ensure valid Supabase session
+  Future<String?> _getValidJwt() async {
+    final client = Supabase.instance.client;
+    var session = client.auth.currentSession;
 
+    if (session == null) {
+      throw Exception("No Supabase session found. Please log in again.");
+    }
+
+    // Refresh session if close to expiry
+    final expiresAt = session.expiresAt;
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (expiresAt != null && expiresAt <= now + 60) {
+      final res = await client.auth.refreshSession();
+      session = res.session;
+      if (session == null) {
+        throw Exception("Failed to refresh session. Please log in again.");
+      }
+    }
+
+    return session.accessToken;
+  }
+
+  /// Fetch all posts for Home feed
   Future<List<Map<String, dynamic>>> fetchPosts() async {
-    final res = await _client
-        .from('posts')
-        .select(
-          'pid, content, media_url, verification_status, created_at, likes, dislikes, owner:users(uid, full_name, username, profile_pic_url)',
-        )
-        .order('created_at', ascending: false);
+    final jwt = await _getValidJwt();
+    final url = Uri.parse('$kBaseUrl/post/');
 
-    return List<Map<String, dynamic>>.from(res);
+    final response = await http.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $jwt",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      return data.map<Map<String, dynamic>>((post) {
+        return {
+          "pid": post["pid"] ?? "",
+          "content": post["content"] ?? "",
+          "authorName": post["author_name"] ?? "",
+          "authorDisplayName": post["author_display_name"] ?? "",
+          "authorAvatar": post["author_avatar"] ?? "",
+          "likes": post["likes"] ?? 0,
+          "dislikes": post["dislikes"] ?? 0,
+          "score": post["score"] ?? 0,
+          "commentsCount": post["comments_count"] ?? 0,
+          "isLikedByCurrentUser": post["is_liked_by_current_user"] ?? false,
+          "communityId": post["community_id"],
+          "communityName": post["community_name"],
+          "tags": post["tags"] ?? [],
+          "verified": post["verification_status"] == "verified",
+          "createdAt": post["created_at"] ?? "",
+        };
+      }).toList();
+    } else {
+      throw Exception(
+        "Failed to fetch posts: ${response.statusCode} → ${response.body}",
+      );
+    }
   }
 
+  /// Like post
   Future<void> likePost(String postId) async {
-    await _client
-        .from('posts')
-        .update({
-          'likes': _client.rpc('increment_likes', params: {'post_id': postId}),
-        })
-        .eq('pid', postId);
+    final jwt = await _getValidJwt();
+    final url = Uri.parse('$kBaseUrl/post/$postId/like');
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $jwt",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to like post: ${response.body}");
+    }
   }
 
+  /// Dislike post
   Future<void> dislikePost(String postId) async {
-    await _client
-        .from('posts')
-        .update({
-          'dislikes': _client.rpc(
-            'increment_dislikes',
-            params: {'post_id': postId},
-          ),
-        })
-        .eq('pid', postId);
+    final jwt = await _getValidJwt();
+    final url = Uri.parse('$kBaseUrl/post/$postId/dislike');
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $jwt",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to dislike post: ${response.body}");
+    }
   }
 }
+
+
+
+
+

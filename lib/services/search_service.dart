@@ -1,48 +1,50 @@
-// lib/services/search_service.dart
-import 'api_client.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchService {
-  final ApiClient _api = ApiClient();
+  final String baseUrl = "https://hive-backend-tnmw.onrender.com";
 
   Future<List<Map<String, dynamic>>> searchPosts({
-    String query = '',
-    String status = 'All', // All | Safe | Under Review | Flagged
+    required String query,
+    String? status,
   }) async {
-    // Build query string manually
-    final params = <String, String>{};
-    if (query.isNotEmpty) params['q'] = query;
-    if (status != 'All') params['status'] = status.toLowerCase();
-
-    final qs = params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
-    final path = qs.isNotEmpty ? '/post/?$qs' : '/post/';
-
-    try {
-      final res = await _api.get(path, auth: false);
-
-      if (res is List) {
-        return res.map((e) => Map<String, dynamic>.from(e as Map)).toList();
-      }
-    } catch (_) {
-      // ignore and fallback
+    if (query.trim().isEmpty) {
+      throw Exception("Query cannot be empty.");
     }
 
-    // fallback client-side filter
-    final all = await _api.get('/post/', auth: false) as List<dynamic>;
-    final lowerQuery = query.toLowerCase();
-    final filtered = all.where((p) {
-      if (p is! Map) return false;
-      final username = (p['author'] is Map ? (p['author']['name'] ?? '') : (p['username'] ?? '')).toString().toLowerCase();
-      final content = (p['content'] ?? '').toString().toLowerCase();
-      final matchesQuery = lowerQuery.isEmpty || username.contains(lowerQuery) || content.contains(lowerQuery);
+    // 1. Get Supabase JWT
+    final session = Supabase.instance.client.auth.currentSession;
+    final jwt = session?.accessToken;
+    if (jwt == null) {
+      throw Exception("No Supabase session found. User not logged in.");
+    }
 
-      if (status == 'All') return matchesQuery;
-      final moderation = (p['moderation_status'] ?? p['status'] ?? '').toString();
-      if (status == 'Safe') return matchesQuery && moderation.toLowerCase().contains('safe');
-      if (status == 'Under Review') return matchesQuery && moderation.toLowerCase().contains('review');
-      if (status == 'Flagged') return matchesQuery && moderation.toLowerCase().contains('flag');
-      return matchesQuery;
-    }).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    // 2. Build request
+    final response = await http.get(
+      Uri.parse("$baseUrl/user/search?name=$query"),
+      headers: {
+        "Authorization": "Bearer $jwt",
+        "Accept": "application/json",
+      },
+    );
 
-    return filtered;
+    // 3. Handle response
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data is List) {
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        throw Exception("Invalid response format.");
+      }
+    } else if (response.statusCode == 400) {
+      throw Exception("Bad Request: query cannot be empty.");
+    } else if (response.statusCode == 404) {
+      throw Exception("No users found for '$query'.");
+    } else {
+      throw Exception(
+        "Unexpected error: ${response.statusCode} ${response.body}",
+      );
+    }
   }
 }
