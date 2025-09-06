@@ -58,47 +58,31 @@ class _Home extends State<Home> {
       drawer: Drawer(backgroundColor: Colors.white,
       child: ListView(
         children: [
-          TextButton(onPressed: () async {
-            try {
-              // 1. Get Supabase JWT
-              final session = supabase.auth.currentSession;
-              final jwt = session?.accessToken;
-
-              if (jwt == null) {
-                throw Exception("No Supabase session found. User not logged in.");
-              }
-
-              // 2. Call your backend logout endpoint
-              final response = await http.get(
-                Uri.parse("https://your-backend.com/user/logout"),
-                headers: {
-                  "Authorization": "Bearer $jwt",
-                  "Content-Type": "application/json",
-                },
-              );
-
-              // 3. Handle response
-              if (response.statusCode == 200) {
-                final data = jsonDecode(response.body);
-                print("✅ ${data['message']}");
-
-                await supabase.auth.signInWithOAuth(
-                  OAuthProvider.google,
-                  redirectTo: kIsWeb ? null : 'com.hive://login-callback', // Optionally set the redirect link to bring back the user via deeplink.
-                  authScreenLaunchMode:
-                  kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
-                );
-              } else {
-                throw Exception(
-                  "❌ Logout failed: ${response.statusCode} ${response.body}",
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            icon: const Icon(Icons.logout, color: Colors.white),
+            label: const Text(
+              "Logout",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            onPressed: () async {
+              try {
+                await supabase.auth.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              } catch (e) {
+                print('Error during logout: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Logout failed: $e")),
                 );
               }
-            } catch (e) {
-              print("⚠️ Error during logout: $e");
-              rethrow;
-            }
-
-          }, child: Text("Sign OUT"))
+            },
+          ),
         ],
       ),),
       body: PageView(
