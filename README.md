@@ -35,11 +35,11 @@ Social Garbage is designed as a modern social platform with integrated content s
 ### 1. Prerequisites
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) installed  
 - Android Studio / VS Code with Flutter extensions  
-- Backend server running (update the `baseUrl` in `lib/core/api/api_client.dart`)  
+- Backend server running (update the `baseUrl` in `lib/api_client.dart`)  
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/social_garbage.git
+git clone https://github.com/shivam-purve/social_garbage.git
 cd social_garbage
 
 ###3.) Install Dependencies
@@ -47,11 +47,11 @@ flutter pub get
 
 ###4.) Configure Base URL
 
-In lib/core/api/api_client.dart, update the kBaseUrl constant with your backend API URL:
+In lib/api_client.dart, update the kBaseUrl constant with your backend API URL:
 
 const String kBaseUrl = 'http://10.0.2.2:8000'; // Android Emulator
 // or
-const String kBaseUrl = 'http://localhost:8000'; // Localhost (desktop/web)
+const String kBaseUrl = '(https://hive-backend-tnmw.onrender.com)'; // Localhost (desktop/web)
 
 5.) Run the App
   flutter run
@@ -60,9 +60,8 @@ Folder Structure
 
 Folder Structure
  lib/
-├── core/
-│   └── api/
-│       └── api_client.dart        # Base API client
+├──
+│   └── api_client.dart        # Base API client
 ├── services/
 │   ├── auth_service.dart          # Authentication API integration
 │   ├── post_service.dart          # Posts API (fetch, like, comment, create)
@@ -113,7 +112,8 @@ Added state persistence for Bottom Navigation Bar
 
 Fixed several routing and connection bugs
 
-Screenshots of different pages:-
+
+##  Screenshots of different pages:-
 
 social_garbage/
 ├── lib/
