@@ -39,6 +39,7 @@ class _UserProfilePageState extends State<UserProfilePage>
         _posts = posts
             .map<Map<String, dynamic>>((p) => {
           "id": p["id"],
+          "verificationStatus": p["verificationStatus"] ?? "Unknown",
           "profileName": userData["full_name"] ?? "User", // fixed field
           "verified": p["verified"],
           "description": p["content"] ?? "",
@@ -96,12 +97,14 @@ class _UserProfilePageState extends State<UserProfilePage>
 
     if (_loading) {
       return const Scaffold(
+        backgroundColor: Colors.white,
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_user == null) {
       return const Scaffold(
+        backgroundColor: Colors.white,
         body: Center(child: Text("No user data found")),
       );
     }

@@ -1,3 +1,4 @@
+
 // lib/screens/search.dart
 import 'package:flutter/material.dart';
 import '../colors_theme/color.dart';
@@ -16,7 +17,6 @@ class _SearchScreenState extends State<SearchScreen>
   bool get wantKeepAlive => true;
 
   final TextEditingController _searchController = TextEditingController();
-  String _filter = "All";
 
   final SearchService _searchService = SearchService();
   List<Map<String, dynamic>> _posts = [];
@@ -33,35 +33,12 @@ class _SearchScreenState extends State<SearchScreen>
     try {
       final results = await _searchService.searchPosts(
         query: _searchController.text,
-        status: _filter,
       );
       setState(() => _posts = results); // results is List<Map<String, dynamic>>
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Search failed: $e")),
-      );
     } finally {
       if (mounted) setState(() => _loading = false);
-    }
-  }
-
-
-  void _setFilter(String filter) {
-    setState(() => _filter = filter);
-    _performSearch();
-  }
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case "Safe":
-        return const Color.fromARGB(255, 0, 171, 74);
-      case "Under Review":
-        return const Color.fromARGB(255, 181, 144, 30);
-      case "Flagged":
-        return const Color.fromARGB(255, 224, 62, 99);
-      default:
-        return Colors.grey;
     }
   }
 
@@ -100,25 +77,7 @@ class _SearchScreenState extends State<SearchScreen>
             ),
             const SizedBox(height: 15),
 
-            // Filter row
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: ["All", "Safe", "Under Review", "Flagged"]
-                    .map((f) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(f),
-                    selected: _filter == f,
-                    onSelected: (_) => _setFilter(f),
-                    selectedColor:
-                    const Color.fromARGB(255, 254, 198, 41),
-                  ),
-                ))
-                    .toList(),
-              ),
-            ),
-            const SizedBox(height: 15),
+            // Removed filter row
 
             // Results
             Expanded(
@@ -128,7 +87,8 @@ class _SearchScreenState extends State<SearchScreen>
                   ? const Center(
                 child: Text(
                   "No results found 🔍",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               )
                   : ListView.builder(
@@ -140,12 +100,13 @@ class _SearchScreenState extends State<SearchScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 3),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8, horizontal: 3),
                     elevation: 3,
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0), // bigger padding for larger card
+                      padding: const EdgeInsets.all(16.0),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start, // align text at top
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Name column
                           Expanded(

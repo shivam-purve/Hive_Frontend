@@ -137,6 +137,7 @@ class UserService {
 
         // Verification
         "verified": post["verification_status"] == "verified",
+        "verificationStatus" : post["verification_status"],
 
         // Timestamp
         "createdAt": post["created_at"] ?? "",
