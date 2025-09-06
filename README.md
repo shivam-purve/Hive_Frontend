@@ -113,9 +113,7 @@ Added state persistence for Bottom Navigation Bar
 
 Fixed several routing and connection bugs
 
-Screenshots
-
-Place your screenshots inside a folder named screenshots/ at the root of the project. Example structure:
+Screenshots of different pages:-
 
 social_garbage/
 ├── lib/
@@ -125,6 +123,25 @@ social_garbage/
 │   ├── create.png
 │   ├── search.png
 │   └── notifs.png
+
+
+## Screenshots
+
+### Home Screen
+![Home Screen](screenshots/home_screen.png)
+
+### Login with Google
+![Login Screen](screenshots/login_screen.png)
+
+### Create Post
+![Create Post](screenshots/create_post.png)
+
+### Notifications
+![Notifications](screenshots/notifications.png)
+
+### Search
+![Search](screenshots/search.png)
+
 
 
 ## Tech Stack
@@ -161,22 +178,6 @@ Document the endpoints you integrated with. Example:
   - `GET /posts?q=term&status=flagged` → Search posts with filters
 
 
-## Screenshots
-
-### Home Screen
-![Home Screen](screenshots/home_screen.png)
-
-### Login with Google
-![Login Screen](screenshots/login_screen.png)
-
-### Create Post
-![Create Post](screenshots/create_post.png)
-
-### Notifications
-![Notifications](screenshots/notifications.png)
-
-### Search
-![Search](screenshots/search.png)
 
 
 ## Known Issues
@@ -191,10 +192,9 @@ Be transparent about current bugs or limitations. Example:
 
 ## Support
 
-If you find this project useful, please consider giving it a ⭐ on GitHub.  
+If you find this project useful, please consider giving it a on GitHub.  
 Your feedback and contributions are always welcome!
 
-## Acknowledgments
 
 ## Acknowledgments
 
