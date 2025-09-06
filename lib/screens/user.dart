@@ -28,16 +28,18 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   Future<void> _loadUserData() async {
     try {
+      final userMap = await _userService.getCurrentUser();
+      final userData = userMap['user']; // <-- Access the inner 'user' object
+      final posts = await _userService.getUserPosts(userData['uid'].toString());
 
-      final user = await _userService.getCurrentUser();
-      final posts = await _userService.getUserPosts(user['uid'].toString());
       if (!mounted) return;
+
       setState(() {
-        _user = user;
+        _user = userData; // store only the user object
         _posts = posts
             .map<Map<String, dynamic>>((p) => {
           "id": p["id"],
-          "profileName": user["name"] ?? "User",
+          "profileName": userData["full_name"] ?? "User", // fixed field
           "verified": p["verified"],
           "description": p["content"] ?? "",
           "imageIcon": Icons.article,
@@ -51,7 +53,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(" $_posts + Failed to load user data: $e")),
+        SnackBar(content: Text("Failed to load user data: $e")),
       );
     }
   }
@@ -149,7 +151,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_user?['name'] ?? "Unknown",
+                      Text(_user?['full_name'] ?? "Unknown",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 4),

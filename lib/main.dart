@@ -39,7 +39,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      routes: {'/comment': (context) => const Comment()},
+      routes:
+      {'/comment': (context) => const Comment(),
+        '/login': (context) => const LoginScreen()},
       home: LoginScreen(),
     );
   }
@@ -215,44 +217,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-}
-
-class UserService {
-  final SupabaseClient _client = supabase;
-
-  /// Create or update user profile when they log in
-  Future<void> upsertUser({
-    required String uid,
-    required String fullName,
-    required String email,
-    String? username,
-    String? profilePicUrl,
-    String? bio,
-  }) async {
-    final response = await _client.from('users').upsert({
-      'uid': uid,
-      'full_name': fullName,
-      'email': email,
-      if (username != null) 'username': username,
-      if (profilePicUrl != null) 'profile_pic_url': profilePicUrl,
-      if (bio != null) 'bio': bio,
-    });
-
-    // Supabase just returns the inserted/updated row(s)
-    if (response == null) {
-      throw Exception("Failed to upsert user");
-    }
-  }
-
-  /// Fetch user profile
-  Future<Map<String, dynamic>?> getUser(String uid) async {
-    final response = await _client
-        .from('users')
-        .select()
-        .eq('uid', uid)
-        .maybeSingle();
-
-    return response;
   }
 }

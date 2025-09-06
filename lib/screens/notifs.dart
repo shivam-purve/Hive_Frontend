@@ -16,18 +16,18 @@ class _NotificationsPageState extends State<NotificationsPage> with AutomaticKee
 
   final List<AppNotification> _notifications = [
     AppNotification(
-      title: "New Message",
-      message: "You got a new message from John",
+      title: "Test Feature for Future Updates",
+      message: "This is a Test Feature for Future Updates",
       time: "10:30 AM", id: '',
     ),
     AppNotification(
-      title: "Reminder",
-      message: "Don’t forget your meeting at 3 PM",
+      title: "Test Feature for Future Updates",
+      message: "This is a Test Feature for Future Updates",
       time: "9:00 AM", id: '',
     ),
     AppNotification(
-      title: "Update",
-      message: "Your app has been updated successfully",
+      title: "Test Feature for Future Updates",
+      message: "This is a Test Feature for Future Updates",
       time: "Yesterday", id: '',
     ),
   ];
